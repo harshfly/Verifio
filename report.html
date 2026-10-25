@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authenticity Report — Verifio</title>
+  <meta name="description" content="Detailed academic authenticity and integrity verification report with module breakdowns and inline flagged text viewer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css?v=2.2" />
+  <link rel="stylesheet" href="report.css?v=1.0" />
+</head>
+<body class="report-page-body">
+  <!-- Top Navigation Header -->
+  <header class="report-navbar">
+    <div class="report-nav-left">
+      <a href="index.html" class="report-brand">
+        <div class="brand-icon">
+          <img src="assets/logo.webp" alt="Verifio Logo" width="22" height="22" />
+        </div>
+        <span class="brand-name">VERIFIO</span>
+      </a>
+      <div class="report-breadcrumbs">
+        <span class="bc-sep">/</span>
+        <a href="index.html" class="bc-link">Home</a>
+        <span class="bc-sep">/</span>
+        <select class="nav-doc-select" id="sample-doc-selector" title="Switch Document Report">
+          <option value="550bffcd-5c22-49b1-b330-fbba1c358392">Resume Technical Support (9% Risk • 4 Flags)</option>
+          <option value="6552ee1d-a9e2-48d2-b550-de135f5a0798">Resume Software Engineer (0% Risk • Clean)</option>
+          <option value="9fae7dfb-1f19-4ea5-9662-72e9200d79d8">Academic Integrity Evaluation (0% Risk • Clean)</option>
+        </select>
+      </div>
+    </div>
+    <div class="report-nav-right">
+      <span class="status-pill status-loading" id="nav-status-pill">
+        <span class="status-dot"></span>
+        <span id="nav-status-text">Fetching Report</span>
+      </span>
+      <button class="nav-action-btn" id="btn-print" title="Export as PDF or print report">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span>Export PDF</span>
+      </button>
+      <button class="nav-action-btn" id="btn-copy-link" title="Copy shareable link">
+        <i class="fa-solid fa-link"></i>
+        <span>Share</span>
+      </button>
+      <a href="index.html" class="nav-action-btn btn-primary" title="Analyze another document">
+        <i class="fa-solid fa-plus"></i>
+        <span>New Scan</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="report-main" id="report-main">
+    <!-- Loading State -->
+    <div class="report-loading-state" id="report-loading-state">
+      <div class="spinner-ring"></div>
+      <h3>Loading Authenticity Report</h3>
+      <p>Retrieving forensic analysis, semantic vectors, and evidence segments...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="report-error-state" id="report-error-state" style="display: none;">
+      <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+      <h3 id="error-title">Report Not Found</h3>
+      <p id="error-desc">We couldn't retrieve the report for this submission ID.</p>
+      <div class="error-actions">
+        <a href="index.html" class="nav-action-btn btn-primary">Upload Document</a>
+        <button class="nav-action-btn" id="btn-load-demo">Load Sample Report</button>
+      </div>
+    </div>
+
+    <!-- Active Report Content -->
+    <div class="report-content" id="report-content" style="display: none;">
+      
+      <!-- Top Hero Section: ScoreGauge + Document Meta -->
+      <section class="report-hero-card">
+        <div class="hero-gauge-col">
+          <div class="gauge-component" id="score-gauge-component">
+            <svg class="gauge-svg" viewBox="0 0 160 160">
+              <circle class="gauge-track" cx="80" cy="80" r="68"></circle>
+              <circle class="gauge-fill" id="gauge-fill-circle" cx="80" cy="80" r="68"></circle>
+            </svg>
+            <div class="gauge-center">
+              <span class="gauge-score-value" id="gauge-score-value">0%</span>
+              <span class="gauge-sublabel">RISK SCORE</span>
+            </div>
+          </div>
+          <div class="gauge-verdict">
+            <div class="verdict-badge" id="verdict-badge">
+              <i class="fa-solid fa-circle-check" id="verdict-icon"></i>
+              <span id="verdict-label">Clean & Authentic</span>
+            </div>
+            <p class="verdict-desc" id="verdict-desc">
+              All 4 detection modules passed within acceptable institutional integrity thresholds.
+            </p>
+          </div>
+        </div>
+
+        <div class="hero-meta-col">
+          <div class="meta-header">
+            <span class="meta-tag">ACADEMIC VERIFICATION AUDIT</span>
+            <span class="meta-date" id="meta-date">—</span>
+          </div>
+          <h1 class="document-title" id="doc-title">Document Title</h1>
+          
+          <div class="meta-pills-row">
+            <div class="meta-pill">
+              <i class="fa-regular fa-file-lines"></i>
+              <span id="meta-filename">document.pdf</span>
+            </div>
+            <div class="meta-pill">
+              <i class="fa-solid fa-fingerprint"></i>
+              <span id="meta-sub-id">ID: —</span>
+              <button class="pill-copy-btn" id="btn-copy-id" title="Copy Submission ID"><i class="fa-regular fa-copy"></i></button>
+            </div>
+            <div class="meta-pill">
+              <i class="fa-solid fa-bolt"></i>
+              <span id="meta-module-count">4 Modules Scanned</span>
+            </div>
+            <div class="meta-pill">
+              <i class="fa-regular fa-clock"></i>
+              <span id="meta-processing-time">Fast Inference (&lt; 2s)</span>
+            </div>
+          </div>
+
+          <div class="meta-summary-box">
+            <div class="summary-metric">
+              <span class="metric-num mono" id="summary-flagged-count">0</span>
+              <span class="metric-lbl">Flagged Segments</span>
+            </div>
+            <div class="summary-metric">
+              <span class="metric-num mono" id="summary-word-count">~0</span>
+              <span class="metric-lbl">Extracted Words</span>
+            </div>
+            <div class="summary-metric">
+              <span class="metric-num mono" id="summary-integrity-tier">Tier 1</span>
+              <span class="metric-lbl">Integrity Band</span>
+            </div>
+            <div class="summary-metric">
+              <span class="metric-num mono" id="summary-engine-ver">v1.0.0</span>
+              <span class="metric-lbl">Engine Spec</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Module Breakdown Cards (4 Pillars) -->
+      <section class="module-breakdown-section">
+        <div class="section-heading">
+          <h2>Module Breakdown &amp; Forensic Analysis</h2>
+          <span class="section-sub">Weighted aggregation computed across four specialized integrity engines</span>
+        </div>
+
+        <div class="module-cards-grid" id="module-cards-grid">
+          <!-- Plagiarism Card -->
+          <div class="module-card card-plagiarism" id="card-plagiarism">
+            <div class="module-card-header">
+              <div class="mod-icon-wrap mod-plagiarism-icon">
+                <i class="fa-solid fa-copy"></i>
+              </div>
+              <div class="mod-titles">
+                <h3>Verbatim Plagiarism</h3>
+                <span class="mod-sub">Direct n-gram sequence matching</span>
+              </div>
+              <div class="mod-score-badge mono" id="score-plagiarism">0%</div>
+            </div>
+            <div class="mod-progress-track">
+              <div class="mod-progress-bar bar-plagiarism" id="bar-plagiarism" style="width: 0%;"></div>
+            </div>
+            <p class="mod-desc">Checks multi-word n-gram overlaps against previously archived academic papers and source repositories.</p>
+            <div class="mod-card-footer">
+              <span class="flag-counter-pill" id="flags-plagiarism">0 matches</span>
+              <button class="expand-btn" data-target="drawer-plagiarism" aria-expanded="false">
+                <span>Evidence</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+            </div>
+            <div class="mod-evidence-drawer" id="drawer-plagiarism" style="display: none;">
+              <div class="drawer-evidence-list" id="evidence-list-plagiarism"></div>
+            </div>
+          </div>
+
+          <!-- Similarity Card -->
+          <div class="module-card card-similarity" id="card-similarity">
+            <div class="module-card-header">
+              <div class="mod-icon-wrap mod-similarity-icon">
+                <i class="fa-solid fa-diagram-project"></i>
+              </div>
+              <div class="mod-titles">
+                <h3>Semantic Similarity</h3>
+                <span class="mod-sub">Dense vector contextual cosine</span>
+              </div>
+              <div class="mod-score-badge mono" id="score-similarity">0%</div>
+            </div>
+            <div class="mod-progress-track">
+              <div class="mod-progress-bar bar-similarity" id="bar-similarity" style="width: 0%;"></div>
+            </div>
+            <p class="mod-desc">Detects paraphrased or structurally identical passages using neural embedding representations.</p>
+            <div class="mod-card-footer">
+              <span class="flag-counter-pill" id="flags-similarity">0 matches</span>
+              <button class="expand-btn" data-target="drawer-similarity" aria-expanded="false">
+                <span>Evidence</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+            </div>
+            <div class="mod-evidence-drawer" id="drawer-similarity" style="display: none;">
+              <div class="drawer-evidence-list" id="evidence-list-similarity"></div>
+            </div>
+          </div>
+
+          <!-- AI Content Card -->
+          <div class="module-card card-ai" id="card-ai">
+            <div class="module-card-header">
+              <div class="mod-icon-wrap mod-ai-icon">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div class="mod-titles">
+                <h3>AI Content Probability</h3>
+                <span class="mod-sub">Perplexity &amp; burstiness analyzer</span>
+              </div>
+              <div class="mod-score-badge mono" id="score-ai">0%</div>
+            </div>
+            <div class="mod-progress-track">
+              <div class="mod-progress-bar bar-ai" id="bar-ai" style="width: 0%;"></div>
+            </div>
+            <p class="mod-desc">Evaluates language entropy, burstiness patterns, and synthetic LLM generation markers.</p>
+            <div class="mod-card-footer">
+              <span class="flag-counter-pill" id="flags-ai">0 markers</span>
+              <button class="expand-btn" data-target="drawer-ai" aria-expanded="false">
+                <span>Evidence</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+            </div>
+            <div class="mod-evidence-drawer" id="drawer-ai" style="display: none;">
+              <div class="drawer-evidence-list" id="evidence-list-ai"></div>
+            </div>
+          </div>
+
+          <!-- Document Manipulation Card -->
+          <div class="module-card card-manipulation" id="card-manipulation">
+            <div class="module-card-header">
+              <div class="mod-icon-wrap mod-manipulation-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div class="mod-titles">
+                <h3>Document Manipulation</h3>
+                <span class="mod-sub">Metadata &amp; font forensics</span>
+              </div>
+              <div class="mod-score-badge mono" id="score-manipulation">0%</div>
+            </div>
+            <div class="mod-progress-track">
+              <div class="mod-progress-bar bar-manipulation" id="bar-manipulation" style="width: 0%;"></div>
+            </div>
+            <p class="mod-desc">Scans for hidden micro-text, homoglyph character substitutions, and anomalous PDF metadata streams.</p>
+            <div class="mod-card-footer">
+              <span class="flag-counter-pill" id="flags-manipulation">0 anomalies</span>
+              <button class="expand-btn" data-target="drawer-manipulation" aria-expanded="false">
+                <span>Evidence</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+            </div>
+            <div class="mod-evidence-drawer" id="drawer-manipulation" style="display: none;">
+              <div class="drawer-evidence-list" id="evidence-list-manipulation"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flagged Text Viewer & Evidence Inspector Workbench -->
+      <section class="workbench-section">
+        <div class="workbench-header">
+          <div class="wb-title-group">
+            <h2>Flagged Text Viewer &amp; Evidence Inspector</h2>
+            <span class="wb-subtitle">Review original document with inline highlight annotations linked to forensic evidence</span>
+          </div>
+
+          <!-- Filter Toolbar -->
+          <div class="wb-toolbar">
+            <div class="filter-pills" id="filter-pills">
+              <button class="filter-pill active" data-filter="all">All Modules (<span id="count-all">0</span>)</button>
+              <button class="filter-pill pill-plagiarism" data-filter="plagiarism">Plagiarism (<span id="count-plagiarism">0</span>)</button>
+              <button class="filter-pill pill-ai" data-filter="ai_detection">AI Content (<span id="count-ai">0</span>)</button>
+              <button class="filter-pill pill-similarity" data-filter="similarity">Similarity (<span id="count-similarity">0</span>)</button>
+              <button class="filter-pill pill-manipulation" data-filter="manipulation">Manipulation (<span id="count-manipulation">0</span>)</button>
+            </div>
+
+            <div class="nav-flag-btns">
+              <button class="nav-step-btn" id="btn-prev-flag" title="Previous flagged segment (P)">
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <span class="nav-step-index mono" id="flag-step-index">0 / 0</span>
+              <button class="nav-step-btn" id="btn-next-flag" title="Next flagged segment (N)">
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="workbench-grid">
+          <!-- Left: Document Text Pane -->
+          <div class="document-text-pane" id="document-text-pane">
+            <div class="pane-top-bar">
+              <span class="pane-label"><i class="fa-regular fa-file-lines"></i> Original Extracted Content</span>
+              <div class="pane-stats">
+                <span id="doc-char-count" class="mono">0 chars</span>
+              </div>
+            </div>
+            <div class="document-text-viewport" id="document-text-viewport">
+              <div class="document-text-content" id="document-text-content">
+                <!-- Highlighted text injected here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Evidence Inspector Side Panel -->
+          <aside class="evidence-inspector-panel" id="evidence-inspector-panel">
+            <div class="inspector-header">
+              <div class="inspector-badge" id="inspector-badge">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span id="inspector-badge-text">Evidence Inspector</span>
+              </div>
+              <span class="inspector-seq mono" id="inspector-seq">Select Highlight</span>
+            </div>
+
+            <!-- Default State when no highlight is selected -->
+            <div class="inspector-empty" id="inspector-empty">
+              <i class="fa-regular fa-hand-pointer"></i>
+              <h4>No Segment Selected</h4>
+              <p>Click on any highlighted text in the document viewer, or use the arrow controls to inspect matched evidence.</p>
+              <div class="legend-box">
+                <h5>HIGHLIGHT ANNOTATION LEGEND</h5>
+                <div class="legend-row">
+                  <span class="legend-color-dot dot-plagiarism"></span>
+                  <span>Verbatim Plagiarism (Red Underline)</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-color-dot dot-ai"></span>
+                  <span>AI Synthesizer Pattern (Purple Underline)</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-color-dot dot-similarity"></span>
+                  <span>Semantic Similarity (Amber Underline)</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-color-dot dot-manipulation"></span>
+                  <span>Document Manipulation (Cyan Underline)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Evidence Detail View -->
+            <div class="inspector-detail" id="inspector-detail" style="display: none;">
+              <div class="detail-module-bar" id="detail-module-bar">
+                <i class="fa-solid fa-copy" id="detail-module-icon"></i>
+                <span id="detail-module-name">Verbatim Plagiarism</span>
+              </div>
+
+              <div class="detail-field">
+                <label>FLAGGED EXCERPT</label>
+                <div class="detail-text-box mono" id="detail-segment-text">
+                  Segment text appears here...
+                </div>
+              </div>
+
+              <div class="detail-grid-metrics">
+                <div class="detail-metric-card">
+                  <label>CONFIDENCE</label>
+                  <span class="detail-metric-val mono" id="detail-confidence">100%</span>
+                </div>
+                <div class="detail-metric-card">
+                  <label>SEVERITY</label>
+                  <span class="detail-metric-val" id="detail-severity">High</span>
+                </div>
+              </div>
+
+              <div class="detail-field">
+                <label>MATCHED SOURCE REFERENCE</label>
+                <div class="detail-source-box mono" id="detail-source-ref">
+                  Corpus document reference
+                </div>
+              </div>
+
+              <div class="detail-field">
+                <label>EVALUATION RECOMMENDATION</label>
+                <p class="detail-reason" id="detail-reason">
+                  Direct verbatim sequence match exceeds allowable threshold. Recommend manual review.
+                </p>
+              </div>
+
+              <div class="inspector-actions">
+                <button class="nav-action-btn" id="btn-scroll-to-highlight">
+                  <i class="fa-solid fa-eye"></i>
+                  <span>Scroll to Text</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Institutional Footer Certification -->
+      <footer class="report-footer-cert">
+        <div class="cert-left">
+          <div class="cert-seal">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <h4>Verifio Academic Authenticity Certificate</h4>
+            <p>Cryptographically verified hash: <span class="mono" id="cert-hash">—</span></p>
+          </div>
+        </div>
+        <div class="cert-right">
+          <span class="cert-note">Generated in accordance with IEEE &amp; Higher Education Integrity Standards</span>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <script src="report.js?v=1.0"></script>
+</body>
+</html>

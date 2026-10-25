@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Verifio</title>
+  <meta name="description" content="Sign in to your Verifio account to access your dashboard, submissions, and reports." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body class="page-body">
+  <div class="bg">
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/bg-video.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="page page-scroll">
+    <header class="header anim" style="--d:0s">
+      <a href="index.html" class="logo-btn" aria-label="Verifio home">
+        <img src="assets/logo.webp" alt="" width="52" height="52" class="logo-img" />
+      </a>
+      <nav class="nav-pill" aria-label="Primary">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="features.html" class="nav-link">Features</a>
+        <a href="how-it-works.html" class="nav-link">How It Works</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <a href="signin.html" class="sign-in desktop-only">
+        <i class="fa-regular fa-user sign-in-icon"></i>
+        <span>Sign in</span>
+        <i class="fa-solid fa-arrow-right sign-in-arrow"></i>
+      </a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </header>
+    <div class="mobile-menu" hidden>
+      <div class="menu-overlay"></div>
+      <div class="menu-sheet">
+        <a href="index.html" class="menu-link">Home</a>
+        <a href="features.html" class="menu-link">Features</a>
+        <a href="how-it-works.html" class="menu-link">How It Works</a>
+        <a href="pricing.html" class="menu-link">Pricing</a>
+        <a href="signin.html" class="menu-sign-in">Sign in</a>
+      </div>
+    </div>
+
+    <main class="auth-section">
+      <div class="auth-card anim" style="--d:0.15s">
+        <div class="auth-logo">
+          <img src="assets/logo.webp" alt="Verifio" width="56" height="56" />
+        </div>
+        <h1 class="auth-title" id="auth-form-title">Welcome back</h1>
+        <p class="auth-subtitle" id="auth-form-subtitle">Sign in to access your dashboard and reports.</p>
+
+        <form class="auth-form" id="auth-form" autocomplete="on">
+          <!-- Name field (signup only) -->
+          <div class="form-group form-group-hidden" id="name-group">
+            <label for="auth-name" class="form-label">Full Name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user input-icon"></i>
+              <input type="text" id="auth-name" class="form-input" placeholder="Jane Doe" autocomplete="name" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="auth-email" class="form-label">Email</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-envelope input-icon"></i>
+              <input type="email" id="auth-email" class="form-input" placeholder="you@university.edu" required autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="auth-password" class="form-label">Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock input-icon"></i>
+              <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required autocomplete="current-password" />
+              <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Role select (signup only) -->
+          <div class="form-group form-group-hidden" id="role-group">
+            <label for="auth-role" class="form-label">Role</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user-tag input-icon"></i>
+              <select id="auth-role" class="form-input form-select">
+                <option value="student">Student</option>
+                <option value="evaluator">Evaluator</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="auth-submit" id="auth-submit">
+            <span>Sign in</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>or continue with</span>
+        </div>
+
+        <div class="social-buttons">
+          <button class="social-btn" type="button">
+            <i class="fa-brands fa-google"></i>
+            <span>Google</span>
+          </button>
+          <button class="social-btn" type="button">
+            <i class="fa-brands fa-github"></i>
+            <span>GitHub</span>
+          </button>
+        </div>
+
+        <p class="auth-switch">
+          <span id="auth-switch-text">Don't have an account?</span>
+          <button type="button" class="auth-switch-btn" id="auth-switch-btn">Create one</button>
+        </p>
+      </div>
+    </main>
+
+    <footer class="page-footer anim" style="--d:0.5s">
+      <p>&copy; 2026 Verifio. Authenticity, Verified.</p>
+    </footer>
+  </div>
+  <script src="pages.js"></script>
+</body>
+</html>

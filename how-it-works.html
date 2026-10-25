@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works — Verifio</title>
+  <meta name="description" content="Learn how Verifio processes your documents through upload, preprocessing, multi-module analysis, scoring, and report generation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body class="page-body">
+  <div class="bg">
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/bg-video.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="page page-scroll">
+    <header class="header anim" style="--d:0s">
+      <a href="index.html" class="logo-btn" aria-label="Verifio home">
+        <img src="assets/logo.webp" alt="" width="52" height="52" class="logo-img" />
+      </a>
+      <nav class="nav-pill" aria-label="Primary">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="report.html" class="nav-link">Reports</a>
+        <a href="features.html" class="nav-link">Features</a>
+        <a href="how-it-works.html" class="nav-link active">How It Works</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <a href="signin.html" class="sign-in desktop-only">
+        <i class="fa-regular fa-user sign-in-icon"></i>
+        <span>Sign in</span>
+        <i class="fa-solid fa-arrow-right sign-in-arrow"></i>
+      </a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </header>
+    <div class="mobile-menu" hidden>
+      <div class="menu-overlay"></div>
+      <div class="menu-sheet">
+        <a href="index.html" class="menu-link">Home</a>
+        <a href="report.html" class="menu-link">Reports</a>
+        <a href="features.html" class="menu-link">Features</a>
+        <a href="how-it-works.html" class="menu-link active">How It Works</a>
+        <a href="pricing.html" class="menu-link">Pricing</a>
+        <a href="signin.html" class="menu-sign-in">Sign in</a>
+      </div>
+    </div>
+
+    <main class="content-section">
+      <div class="section-header anim" style="--d:0.1s">
+        <span class="section-badge"><i class="fa-solid fa-route"></i> Pipeline</span>
+        <h1 class="section-title">From Upload<br>to Verdict</h1>
+        <p class="section-subtitle">Your document flows through a rigorous, transparent pipeline. Every step produces traceable evidence — no black-box decisions.</p>
+      </div>
+
+      <!-- Timeline Steps -->
+      <div class="timeline anim" style="--d:0.2s">
+        <div class="timeline-line"></div>
+
+        <div class="timeline-step">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <div class="step-icon" style="--accent: #6366f1;">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <h2 class="step-title">Upload</h2>
+            <p class="step-desc">Drag and drop your PDF or DOCX file. We validate the file type and size, store the original securely, and create a submission record. Your document is queued for processing instantly.</p>
+            <div class="step-tags">
+              <span class="step-tag">PDF</span>
+              <span class="step-tag">DOCX</span>
+              <span class="step-tag">TXT</span>
+              <span class="step-tag">Max 50MB</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <div class="step-icon" style="--accent: #8b5cf6;">
+              <i class="fa-solid fa-gears"></i>
+            </div>
+            <h2 class="step-title">Preprocessing</h2>
+            <p class="step-desc">Text is extracted (with OCR fallback for scanned PDFs), cleaned, normalized, and segmented into sentences with stable IDs. Raw metadata — timestamps, author, producer — is captured separately for manipulation analysis.</p>
+            <div class="step-tags">
+              <span class="step-tag">pdfplumber</span>
+              <span class="step-tag">OCR fallback</span>
+              <span class="step-tag">Unicode normalize</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <div class="step-icon" style="--accent: #f59e0b;">
+              <i class="fa-solid fa-diagram-project"></i>
+            </div>
+            <h2 class="step-title">Parallel Analysis</h2>
+            <p class="step-desc">Four independent modules run simultaneously: plagiarism n-gram matching, AI content classification, metadata manipulation checks, and semantic similarity search. Each produces its own sub-score and flagged segments.</p>
+            <div class="step-modules">
+              <div class="mini-module" style="--mc: #6366f1;"><i class="fa-solid fa-copy"></i> Plagiarism</div>
+              <div class="mini-module" style="--mc: #f59e0b;"><i class="fa-solid fa-robot"></i> AI Detection</div>
+              <div class="mini-module" style="--mc: #ef4444;"><i class="fa-solid fa-file-shield"></i> Manipulation</div>
+              <div class="mini-module" style="--mc: #10b981;"><i class="fa-solid fa-magnifying-glass-chart"></i> Similarity</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-number">04</div>
+          <div class="step-content">
+            <div class="step-icon" style="--accent: #10b981;">
+              <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <h2 class="step-title">Scoring Engine</h2>
+            <p class="step-desc">Sub-scores are combined using configurable, institution-adjustable weights into a single authenticity score (0–100). Threshold bands assign a human-readable status — never a binary pass/fail.</p>
+            <div class="score-bands">
+              <div class="band band-clean"><i class="fa-solid fa-circle-check"></i> Clean (80–100)</div>
+              <div class="band band-review"><i class="fa-solid fa-triangle-exclamation"></i> Review (50–79)</div>
+              <div class="band band-flagged"><i class="fa-solid fa-flag"></i> Flagged (0–49)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-step">
+          <div class="step-number">05</div>
+          <div class="step-content">
+            <div class="step-icon" style="--accent: #ec4899;">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <h2 class="step-title">Report Generation</h2>
+            <p class="step-desc">A comprehensive report is generated: the hero score gauge, per-module breakdown cards with expandable evidence, and an inline text viewer with highlighted flagged segments linked to matched sources. Exportable as PDF.</p>
+            <div class="step-tags">
+              <span class="step-tag">Score Gauge</span>
+              <span class="step-tag">Evidence Cards</span>
+              <span class="step-tag">PDF Export</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processing Speed -->
+      <div class="speed-section anim" style="--d:0.4s">
+        <div class="speed-card">
+          <div class="speed-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="speed-content">
+            <h3>Average processing time</h3>
+            <div class="speed-value">~8 seconds</div>
+            <p>For a standard 10-page document. Longer documents process proportionally. Real-time progress updates keep you informed throughout.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer anim" style="--d:0.5s">
+      <p>&copy; 2026 Verifio. Authenticity, Verified.</p>
+    </footer>
+  </div>
+  <script src="pages.js"></script>
+</body>
+</html>

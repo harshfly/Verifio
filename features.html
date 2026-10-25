@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Features — Verifio</title>
+  <meta name="description" content="Explore Verifio's four powerful analysis modules: plagiarism detection, AI content detection, document manipulation analysis, and semantic similarity search." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body class="page-body">
+  <div class="bg">
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/bg-video.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="page page-scroll">
+    <header class="header anim" style="--d:0s">
+      <a href="index.html" class="logo-btn" aria-label="Verifio home">
+        <img src="assets/logo.webp" alt="" width="52" height="52" class="logo-img" />
+      </a>
+      <nav class="nav-pill" aria-label="Primary">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="report.html" class="nav-link">Reports</a>
+        <a href="features.html" class="nav-link active">Features</a>
+        <a href="how-it-works.html" class="nav-link">How It Works</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <a href="signin.html" class="sign-in desktop-only">
+        <i class="fa-regular fa-user sign-in-icon"></i>
+        <span>Sign in</span>
+        <i class="fa-solid fa-arrow-right sign-in-arrow"></i>
+      </a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </header>
+    <div class="mobile-menu" hidden>
+      <div class="menu-overlay"></div>
+      <div class="menu-sheet">
+        <a href="index.html" class="menu-link">Home</a>
+        <a href="report.html" class="menu-link">Reports</a>
+        <a href="features.html" class="menu-link active">Features</a>
+        <a href="how-it-works.html" class="menu-link">How It Works</a>
+        <a href="pricing.html" class="menu-link">Pricing</a>
+        <a href="signin.html" class="menu-sign-in">Sign in</a>
+      </div>
+    </div>
+
+    <main class="content-section">
+      <div class="section-header anim" style="--d:0.1s">
+        <span class="section-badge"><i class="fa-solid fa-cube"></i> Modules</span>
+        <h1 class="section-title">Four Engines.<br>One Verdict.</h1>
+        <p class="section-subtitle">Each module is an independent detection pipeline producing its own sub-score and flagged evidence. Combined, they give you a comprehensive authenticity report.</p>
+      </div>
+
+      <div class="features-grid anim" style="--d:0.25s">
+        <!-- Plagiarism Detection -->
+        <div class="feature-card" style="--accent: #6366f1;">
+          <div class="feature-icon-wrap" style="--accent: #6366f1;">
+            <i class="fa-solid fa-copy"></i>
+          </div>
+          <h2 class="feature-title">Plagiarism Detection</h2>
+          <p class="feature-desc">N-gram overlap analysis against a growing corpus of academic submissions. Identifies verbatim and near-exact copy-paste with source attribution.</p>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> Exact & near-exact matching</li>
+            <li><i class="fa-solid fa-check"></i> Source reference tracking</li>
+            <li><i class="fa-solid fa-check"></i> Sentence-level granularity</li>
+          </ul>
+          <div class="feature-score-preview">
+            <span class="score-label">Sub-score</span>
+            <span class="score-bar"><span class="score-fill" style="width: 92%; background: #6366f1;"></span></span>
+            <span class="score-value">92/100</span>
+          </div>
+        </div>
+
+        <!-- AI Detection -->
+        <div class="feature-card" style="--accent: #f59e0b;">
+          <div class="feature-icon-wrap" style="--accent: #f59e0b;">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <h2 class="feature-title">AI Content Detection</h2>
+          <p class="feature-desc">Dual-signal analysis using a fine-tuned RoBERTa classifier and perplexity/burstiness heuristics to identify machine-generated paragraphs.</p>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> RoBERTa-based classification</li>
+            <li><i class="fa-solid fa-check"></i> Perplexity & burstiness analysis</li>
+            <li><i class="fa-solid fa-check"></i> Paragraph-level flagging</li>
+          </ul>
+          <div class="feature-score-preview">
+            <span class="score-label">Sub-score</span>
+            <span class="score-bar"><span class="score-fill" style="width: 87%; background: #f59e0b;"></span></span>
+            <span class="score-value">87/100</span>
+          </div>
+        </div>
+
+        <!-- Manipulation Detection -->
+        <div class="feature-card" style="--accent: #ef4444;">
+          <div class="feature-icon-wrap" style="--accent: #ef4444;">
+            <i class="fa-solid fa-file-shield"></i>
+          </div>
+          <h2 class="feature-title">Manipulation Analysis</h2>
+          <p class="feature-desc">Deep inspection of file metadata — timestamps, author fields, producer software, revision counts, and PDF object-level font inconsistencies.</p>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> Metadata anomaly detection</li>
+            <li><i class="fa-solid fa-check"></i> Timestamp consistency checks</li>
+            <li><i class="fa-solid fa-check"></i> Font & structure analysis</li>
+          </ul>
+          <div class="feature-score-preview">
+            <span class="score-label">Sub-score</span>
+            <span class="score-bar"><span class="score-fill" style="width: 95%; background: #ef4444;"></span></span>
+            <span class="score-value">95/100</span>
+          </div>
+        </div>
+
+        <!-- Similarity Search -->
+        <div class="feature-card" style="--accent: #10b981;">
+          <div class="feature-icon-wrap" style="--accent: #10b981;">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+          </div>
+          <h2 class="feature-title">Semantic Similarity</h2>
+          <p class="feature-desc">Sentence-transformer embeddings with cosine similarity search across the entire submission corpus. Catches paraphrased content that n-grams miss.</p>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> Paraphrase-level detection</li>
+            <li><i class="fa-solid fa-check"></i> Vector similarity search</li>
+            <li><i class="fa-solid fa-check"></i> Confidence scoring</li>
+          </ul>
+          <div class="feature-score-preview">
+            <span class="score-label">Sub-score</span>
+            <span class="score-bar"><span class="score-fill" style="width: 89%; background: #10b981;"></span></span>
+            <span class="score-value">89/100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Features -->
+      <div class="extras-section anim" style="--d:0.4s">
+        <h2 class="extras-title">And everything you need</h2>
+        <div class="extras-grid">
+          <div class="extra-item">
+            <i class="fa-solid fa-gauge-high"></i>
+            <h3>Weighted Scoring</h3>
+            <p>Configurable module weights that combine into a single authenticity score with clean/review/flagged bands.</p>
+          </div>
+          <div class="extra-item">
+            <i class="fa-solid fa-file-pdf"></i>
+            <h3>PDF Export</h3>
+            <p>Generate detailed, shareable PDF reports with all evidence, scores, and flagged segments for institutional records.</p>
+          </div>
+          <div class="extra-item">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h3>Role-Based Access</h3>
+            <p>Three access tiers — student, evaluator, admin — ensuring sensitive reports stay with authorized users only.</p>
+          </div>
+          <div class="extra-item">
+            <i class="fa-solid fa-bolt"></i>
+            <h3>Async Processing</h3>
+            <p>Celery-powered task queue processes documents in the background with real-time status updates.</p>
+          </div>
+          <div class="extra-item">
+            <i class="fa-solid fa-moon"></i>
+            <h3>Dark Mode</h3>
+            <p>Built from day one with CSS variables. Switch seamlessly between light and dark themes across every view.</p>
+          </div>
+          <div class="extra-item">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <h3>Fully Responsive</h3>
+            <p>Every page, every component — optimized for desktop, tablet, and mobile with adaptive layouts.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer anim" style="--d:0.5s">
+      <p>&copy; 2026 Verifio. Authenticity, Verified.</p>
+    </footer>
+  </div>
+  <script src="pages.js"></script>
+</body>
+</html>

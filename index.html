@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifio — Authenticity, Verified</title>
+  <meta name="description" content="Verifio — AI-powered academic authenticity validation. Detect plagiarism, AI-generated content, and document manipulation with production-grade accuracy." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css?v=3.0" />
+</head>
+<body>
+  <div class="bg">
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/bg-video.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="page">
+    <header class="header anim" style="--d:0s">
+      <a href="index.html" class="logo-btn" aria-label="Verifio home">
+        <img src="assets/logo.webp" alt="" width="52" height="52" class="logo-img" />
+      </a>
+      <nav class="nav-pill" aria-label="Primary">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="report.html" class="nav-link">Reports</a>
+        <a href="features.html" class="nav-link">Features</a>
+        <a href="how-it-works.html" class="nav-link">How It Works</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <a href="signin.html" class="sign-in desktop-only">
+        <i class="fa-regular fa-user sign-in-icon"></i>
+        <span>Sign in</span>
+        <i class="fa-solid fa-arrow-right sign-in-arrow"></i>
+      </a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </header>
+    <div class="mobile-menu" hidden>
+      <div class="menu-overlay"></div>
+      <div class="menu-sheet">
+        <a href="index.html" class="menu-link active">Home</a>
+        <a href="report.html" class="menu-link">Reports</a>
+        <a href="features.html" class="menu-link">Features</a>
+        <a href="how-it-works.html" class="menu-link">How It Works</a>
+        <a href="pricing.html" class="menu-link">Pricing</a>
+        <a href="signin.html" class="menu-sign-in">Sign in</a>
+      </div>
+    </div>
+    <main class="hero">
+      <div class="trust-row anim" style="--d:0.05s">
+        <div class="avatar-ring" style="--z:1">
+          <div class="avatar-inner"><i class="fa-solid fa-graduation-cap"></i></div>
+        </div>
+        <div class="avatar-ring" style="--z:2">
+          <div class="avatar-inner"><i class="fa-solid fa-building-columns"></i></div>
+        </div>
+        <div class="avatar-ring" style="--z:4">
+          <div class="avatar-inner"><i class="fa-solid fa-flask"></i></div>
+        </div>
+        <div class="trust-pill">
+          <span class="trust-text">Trusted by 500+ Institutions</span>
+        </div>
+      </div>
+      <div class="headline anim">
+        <span class="headline-line" style="--d:0.12s">Authenticity</span>
+        <span class="headline-line" style="--d:0.3s">Verified By AI</span>
+      </div>
+      <p class="subhead anim" style="--d:0.28s">
+        Detect plagiarism, AI-generated content, and document manipulation
+        with a modular analysis engine built for academic integrity.
+      </p>
+      <!-- Chat box -->
+      <div class="chatbox anim" style="--d:0.4s">
+        <div class="chatbox-files" id="chatbox-files" style="display: none;"></div>
+        <textarea class="chatbox-input" id="chatbox-input" placeholder="How authentic is this research paper?" rows="1"></textarea>
+        <input type="file" id="chatbox-file-input" class="sr-only-file-input" style="position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; pointer-events: none !important;" accept=".pdf,.docx,.txt" multiple />
+        <div class="chatbox-bar">
+          <label for="chatbox-file-input" class="chatbox-btn chatbox-add" id="chatbox-add" title="Upload document from device (.pdf, .docx, .txt)" role="button" tabindex="0">
+            <i class="fa-solid fa-plus"></i>
+          </label>
+          <div class="chatbox-status" id="chatbox-status" style="display: none;">
+            <span class="chatbox-status-dot"></span>
+            <span class="chatbox-status-text" id="chatbox-status-text">Uploading...</span>
+          </div>
+          <div class="chatbox-bar-right">
+            <button type="button" class="chatbox-btn chatbox-mic" aria-label="Voice input" id="chatbox-mic">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button type="button" class="chatbox-btn chatbox-send" aria-label="Send" id="chatbox-send" title="Run Authenticity Analysis">
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="chatbox-subtext anim" style="--d:0.45s">
+        <span>Supports .PDF, .DOCX, .TXT</span>
+        <span>•</span>
+        <span>4-Module Parallel Forensic Pipeline</span>
+      </div>
+    </main>
+
+    <!-- Global Drag & Drop Overlay -->
+    <div class="drop-overlay" id="drop-overlay" style="display: none;">
+      <div class="drop-overlay-box">
+        <i class="fa-solid fa-cloud-arrow-up drop-overlay-icon"></i>
+        <h3>Drop research paper here</h3>
+        <p>Supports .PDF, .DOCX, and .TXT for authenticity verification</p>
+      </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="report-modal" id="report-modal" style="display: none;" aria-hidden="true">
+      <div class="report-dialog">
+        <div class="report-header">
+          <div class="report-title-wrap">
+            <div class="logo-btn" style="width: 32px; height: 32px;">
+              <img src="assets/logo.webp" alt="Verifio" width="22" height="22" />
+            </div>
+            <div>
+              <h2 class="report-title">Authenticity Analysis Report</h2>
+              <span id="report-doc-title" style="font-size: 12px; color: #94a3b8;">Document Report</span>
+            </div>
+          </div>
+          <button class="report-close" id="report-close" aria-label="Close report">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="report-body" id="report-body">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+    <footer class="stats">
+      <div class="stat anim" style="--d:0.5s">
+        <span class="stat-icon">%</span>
+        <span class="stat-value" data-target="99.7" data-suffix="%" data-decimals="1">0%</span>
+        <span class="stat-label">Detection Accuracy</span>
+      </div>
+      <div class="stat anim" style="--d:0.58s">
+        <span class="stat-icon">#</span>
+        <span class="stat-value" data-target="1.8" data-suffix="M" data-decimals="1">0M</span>
+        <span class="stat-label">Documents Scanned</span>
+      </div>
+      <div class="stat anim" style="--d:0.66s">
+        <span class="stat-icon">*</span>
+        <span class="stat-value" data-target="4" data-suffix="" data-decimals="0">0</span>
+        <span class="stat-label">Analysis Modules</span>
+      </div>
+      <div class="stat anim" style="--d:0.74s">
+        <span class="stat-icon">&lt;</span>
+        <span class="stat-value" data-target="8" data-suffix="s" data-decimals="0">0s</span>
+        <span class="stat-label">Avg. Processing</span>
+      </div>
+    </footer>
+  </div>
+  <script src="main.js?v=3.0"></script>
+</body>
+</html>

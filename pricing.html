@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing — Verifio</title>
+  <meta name="description" content="Choose the right Verifio plan for your institution. From individual researchers to enterprise-scale academic integrity solutions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body class="page-body">
+  <div class="bg">
+    <video id="bg-video" class="bg-video" autoplay muted loop playsinline preload="auto">
+      <source src="assets/bg-video.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="page page-scroll">
+    <header class="header anim" style="--d:0s">
+      <a href="index.html" class="logo-btn" aria-label="Verifio home">
+        <img src="assets/logo.webp" alt="" width="52" height="52" class="logo-img" />
+      </a>
+      <nav class="nav-pill" aria-label="Primary">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="report.html" class="nav-link">Reports</a>
+        <a href="features.html" class="nav-link">Features</a>
+        <a href="how-it-works.html" class="nav-link">How It Works</a>
+        <a href="pricing.html" class="nav-link active">Pricing</a>
+      </nav>
+      <a href="signin.html" class="sign-in desktop-only">
+        <i class="fa-regular fa-user sign-in-icon"></i>
+        <span>Sign in</span>
+        <i class="fa-solid fa-arrow-right sign-in-arrow"></i>
+      </a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
+    </header>
+    <div class="mobile-menu" hidden>
+      <div class="menu-overlay"></div>
+      <div class="menu-sheet">
+        <a href="index.html" class="menu-link">Home</a>
+        <a href="report.html" class="menu-link">Reports</a>
+        <a href="features.html" class="menu-link">Features</a>
+        <a href="how-it-works.html" class="menu-link">How It Works</a>
+        <a href="pricing.html" class="menu-link active">Pricing</a>
+        <a href="signin.html" class="menu-sign-in">Sign in</a>
+      </div>
+    </div>
+
+    <main class="content-section">
+      <div class="section-header anim" style="--d:0.1s">
+        <span class="section-badge"><i class="fa-solid fa-tags"></i> Pricing</span>
+        <h1 class="section-title">Plans That<br>Scale With You</h1>
+        <p class="section-subtitle">Start free. Upgrade when your institution needs more power, more scans, and priority support.</p>
+      </div>
+
+      <!-- Billing Toggle -->
+      <div class="billing-toggle anim" style="--d:0.18s">
+        <span class="billing-label billing-active" id="monthly-label">Monthly</span>
+        <button class="toggle-switch" id="billing-toggle" aria-label="Toggle annual billing">
+          <span class="toggle-knob"></span>
+        </button>
+        <span class="billing-label" id="annual-label">Annual <span class="save-badge">Save 20%</span></span>
+      </div>
+
+      <div class="pricing-grid anim" style="--d:0.25s">
+        <!-- Free -->
+        <div class="pricing-card">
+          <div class="plan-header">
+            <span class="plan-name">Researcher</span>
+            <div class="plan-price">
+              <span class="price-amount" data-monthly="0" data-annual="0">$0</span>
+              <span class="price-period">/month</span>
+            </div>
+            <p class="plan-tagline">For individual researchers and students.</p>
+          </div>
+          <ul class="plan-features">
+            <li><i class="fa-solid fa-check"></i> 10 scans/month</li>
+            <li><i class="fa-solid fa-check"></i> All 4 analysis modules</li>
+            <li><i class="fa-solid fa-check"></i> Basic reports</li>
+            <li><i class="fa-solid fa-check"></i> 10MB file limit</li>
+            <li class="plan-feature-disabled"><i class="fa-solid fa-xmark"></i> PDF export</li>
+            <li class="plan-feature-disabled"><i class="fa-solid fa-xmark"></i> Priority processing</li>
+          </ul>
+          <a href="signin.html" class="plan-cta plan-cta-outline">Get started free</a>
+        </div>
+
+        <!-- Pro (Popular) -->
+        <div class="pricing-card pricing-card-featured">
+          <div class="popular-badge">Most Popular</div>
+          <div class="plan-header">
+            <span class="plan-name">Institution</span>
+            <div class="plan-price">
+              <span class="price-amount" data-monthly="49" data-annual="39">$49</span>
+              <span class="price-period">/month</span>
+            </div>
+            <p class="plan-tagline">For departments and small institutions.</p>
+          </div>
+          <ul class="plan-features">
+            <li><i class="fa-solid fa-check"></i> 500 scans/month</li>
+            <li><i class="fa-solid fa-check"></i> All 4 analysis modules</li>
+            <li><i class="fa-solid fa-check"></i> Detailed reports with evidence</li>
+            <li><i class="fa-solid fa-check"></i> 50MB file limit</li>
+            <li><i class="fa-solid fa-check"></i> PDF export</li>
+            <li><i class="fa-solid fa-check"></i> Priority processing</li>
+          </ul>
+          <a href="signin.html" class="plan-cta plan-cta-solid">Start 14-day trial</a>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card">
+          <div class="plan-header">
+            <span class="plan-name">Enterprise</span>
+            <div class="plan-price">
+              <span class="price-amount" data-monthly="199" data-annual="159">$199</span>
+              <span class="price-period">/month</span>
+            </div>
+            <p class="plan-tagline">For universities and large organizations.</p>
+          </div>
+          <ul class="plan-features">
+            <li><i class="fa-solid fa-check"></i> Unlimited scans</li>
+            <li><i class="fa-solid fa-check"></i> All 4 analysis modules</li>
+            <li><i class="fa-solid fa-check"></i> Full reports + admin dashboard</li>
+            <li><i class="fa-solid fa-check"></i> 100MB file limit</li>
+            <li><i class="fa-solid fa-check"></i> API access</li>
+            <li><i class="fa-solid fa-check"></i> Custom weight configuration</li>
+          </ul>
+          <a href="signin.html" class="plan-cta plan-cta-outline">Contact sales</a>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="faq-section anim" style="--d:0.4s">
+        <h2 class="faq-title">Common Questions</h2>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-circle-question"></i> What file formats are supported?</h3>
+            <p class="faq-answer">We currently support PDF, DOCX, and plain text files. Scanned PDFs are processed with OCR fallback for text extraction.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-circle-question"></i> How accurate is AI detection?</h3>
+            <p class="faq-answer">Our dual-signal approach (RoBERTa + perplexity heuristics) achieves high accuracy, but outputs are always labelled as probabilities — never binary verdicts.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-circle-question"></i> Can I adjust the scoring weights?</h3>
+            <p class="faq-answer">Yes — Enterprise plans include admin access to configure module weights, allowing your institution to prioritize the signals that matter most.</p>
+          </div>
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-circle-question"></i> Is my data secure?</h3>
+            <p class="faq-answer">Absolutely. All files are encrypted at rest and in transit. Role-based access ensures reports are only visible to authorized users.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer anim" style="--d:0.5s">
+      <p>&copy; 2026 Verifio. Authenticity, Verified.</p>
+    </footer>
+  </div>
+  <script src="pages.js"></script>
+</body>
+</html>
