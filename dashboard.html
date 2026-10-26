@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluator Dashboard — Verifio</title>
+  <meta name="description" content="Verifio evaluator dashboard — aggregate submission analytics, score distribution, and admin weight configuration panel." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css?v=3.0" />
+  <link rel="stylesheet" href="dashboard.css?v=1.0" />
+</head>
+<body class="dashboard-body">
+  <!-- Top Navigation Header -->
+  <header class="dash-navbar">
+    <div class="dash-nav-left">
+      <a href="index.html" class="dash-brand">
+        <div class="brand-icon">
+          <img src="assets/logo.webp" alt="Verifio Logo" width="22" height="22" />
+        </div>
+        <span class="brand-name">VERIFIO</span>
+      </a>
+      <div class="dash-breadcrumbs">
+        <span class="bc-sep">/</span>
+        <a href="index.html" class="bc-link">Home</a>
+        <span class="bc-sep">/</span>
+        <span class="bc-current">Evaluator Dashboard</span>
+      </div>
+    </div>
+    <div class="dash-nav-right">
+      <span class="role-badge" id="user-role-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span id="user-role-text">Evaluator</span>
+      </span>
+      <button class="nav-action-btn" id="btn-refresh" title="Refresh dashboard data">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        <span>Refresh</span>
+      </button>
+      <a href="index.html" class="nav-action-btn btn-primary" title="Upload a new document">
+        <i class="fa-solid fa-plus"></i>
+        <span>New Scan</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dash-main">
+    <!-- Loading State -->
+    <div class="dash-loading" id="dash-loading">
+      <div class="spinner-ring"></div>
+      <h3>Loading Dashboard</h3>
+      <p>Fetching aggregate analytics, submission records, and configuration...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="dash-error" id="dash-error" style="display: none;">
+      <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+      <h3 id="error-title">Access Denied</h3>
+      <p id="error-desc">This dashboard requires evaluator or admin privileges.</p>
+      <div class="error-actions">
+        <a href="signin.html" class="nav-action-btn btn-primary">Sign In</a>
+        <a href="index.html" class="nav-action-btn">Go Home</a>
+      </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dash-content" id="dash-content" style="display: none;">
+
+      <!-- Hero Stats Row -->
+      <section class="stats-hero-section">
+        <div class="stats-hero-header">
+          <div>
+            <h1 class="dash-page-title">Analytics Dashboard</h1>
+            <p class="dash-page-subtitle">Aggregate submission intelligence and integrity monitoring</p>
+          </div>
+          <div class="stats-live-badge">
+            <span class="live-dot"></span>
+            <span>Live Data</span>
+          </div>
+        </div>
+
+        <div class="stats-cards-grid">
+          <!-- Total Submissions -->
+          <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-blue">
+              <i class="fa-solid fa-file-arrow-up"></i>
+            </div>
+            <div class="stat-data">
+              <span class="stat-value mono" id="stat-total-submissions">0</span>
+              <span class="stat-label">Total Submissions</span>
+            </div>
+            <div class="stat-sparkline stat-sparkline-blue"></div>
+          </div>
+
+          <!-- Total Reports -->
+          <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-green">
+              <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div class="stat-data">
+              <span class="stat-value mono" id="stat-total-reports">0</span>
+              <span class="stat-label">Reports Generated</span>
+            </div>
+            <div class="stat-sparkline stat-sparkline-green"></div>
+          </div>
+
+          <!-- Average Score -->
+          <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-amber">
+              <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <div class="stat-data">
+              <span class="stat-value mono" id="stat-avg-score">—</span>
+              <span class="stat-label">Avg. Risk Score</span>
+            </div>
+            <div class="stat-sparkline stat-sparkline-amber"></div>
+          </div>
+
+          <!-- Total Users -->
+          <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-purple">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-data">
+              <span class="stat-value mono" id="stat-total-users">0</span>
+              <span class="stat-label">Registered Users</span>
+            </div>
+            <div class="stat-sparkline stat-sparkline-purple"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts Row -->
+      <section class="charts-section">
+        <!-- Submissions by Status (Donut) -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h2><i class="fa-solid fa-chart-pie"></i> Submissions by Status</h2>
+            <span class="chart-badge">Pipeline Distribution</span>
+          </div>
+          <div class="chart-body">
+            <div class="donut-chart-wrap">
+              <svg class="donut-chart" viewBox="0 0 200 200" id="donut-submissions">
+                <circle class="donut-bg" cx="100" cy="100" r="78"></circle>
+                <!-- Segments injected by JS -->
+              </svg>
+              <div class="donut-center-label">
+                <span class="donut-total mono" id="donut-total-subs">0</span>
+                <span class="donut-sub">Total</span>
+              </div>
+            </div>
+            <div class="donut-legend" id="legend-submissions">
+              <!-- Legend injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Distribution (Bar Chart) -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h2><i class="fa-solid fa-chart-column"></i> Score Distribution</h2>
+            <span class="chart-badge">Report Verdicts</span>
+          </div>
+          <div class="chart-body">
+            <div class="bar-chart-wrap" id="bar-chart-scores">
+              <div class="bar-group">
+                <div class="bar-col">
+                  <div class="bar bar-clean" id="bar-clean" style="height: 0%;"></div>
+                </div>
+                <span class="bar-label">Clean</span>
+                <span class="bar-count mono" id="bar-count-clean">0</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col">
+                  <div class="bar bar-review" id="bar-review" style="height: 0%;"></div>
+                </div>
+                <span class="bar-label">Review</span>
+                <span class="bar-count mono" id="bar-count-review">0</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-col">
+                  <div class="bar bar-flagged" id="bar-flagged" style="height: 0%;"></div>
+                </div>
+                <span class="bar-label">Flagged</span>
+                <span class="bar-count mono" id="bar-count-flagged">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Submissions Table Section -->
+      <section class="table-section">
+        <div class="table-header">
+          <div class="table-title-group">
+            <h2><i class="fa-solid fa-table-list"></i> All Submissions</h2>
+            <span class="table-subtitle">Full institutional submission log with sorting and filtering</span>
+          </div>
+          <div class="table-controls">
+            <div class="table-search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" class="table-search" id="table-search" placeholder="Search by filename or title..." />
+            </div>
+            <select class="table-filter-select" id="filter-status" title="Filter by status">
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="completed">Completed</option>
+              <option value="failed">Failed</option>
+            </select>
+            <select class="table-filter-select" id="filter-verdict" title="Filter by verdict">
+              <option value="all">All Verdicts</option>
+              <option value="clean">Clean</option>
+              <option value="review">Review</option>
+              <option value="flagged">Flagged</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="submissions-table" id="submissions-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="title">
+                  <span>Document</span>
+                  <i class="fa-solid fa-sort sort-icon"></i>
+                </th>
+                <th class="sortable" data-sort="user">
+                  <span>Submitted By</span>
+                  <i class="fa-solid fa-sort sort-icon"></i>
+                </th>
+                <th class="sortable" data-sort="status">
+                  <span>Status</span>
+                  <i class="fa-solid fa-sort sort-icon"></i>
+                </th>
+                <th class="sortable" data-sort="score">
+                  <span>Risk Score</span>
+                  <i class="fa-solid fa-sort sort-icon"></i>
+                </th>
+                <th class="sortable" data-sort="verdict">
+                  <span>Verdict</span>
+                  <i class="fa-solid fa-sort sort-icon"></i>
+                </th>
+                <th class="sortable" data-sort="date">
+                  <span>Date</span>
+                  <i class="fa-solid fa-sort sort-icon"></i>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="submissions-tbody">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-footer">
+          <span class="table-result-count" id="table-result-count">0 submissions</span>
+          <div class="table-pagination" id="table-pagination">
+            <!-- Pagination injected by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Admin Weight Configuration Section (admin-only) -->
+      <section class="admin-section" id="admin-section" style="display: none;">
+        <div class="admin-header">
+          <div class="admin-title-group">
+            <h2><i class="fa-solid fa-sliders"></i> Scoring Engine Configuration</h2>
+            <span class="admin-subtitle">Adjust module weights for the authenticity scoring formula. Weights must sum to 1.0.</span>
+          </div>
+          <div class="admin-lock-badge">
+            <i class="fa-solid fa-lock"></i>
+            <span>Admin Only</span>
+          </div>
+        </div>
+
+        <div class="weights-card">
+          <div class="weights-formula">
+            <span class="formula-label">SCORING FORMULA</span>
+            <code class="formula-code mono">
+              AuthenticityScore = (w<sub>p</sub> × Plagiarism) + (w<sub>s</sub> × Similarity) + (w<sub>a</sub> × AI Detection) + (w<sub>m</sub> × Manipulation)
+            </code>
+          </div>
+
+          <form class="weights-form" id="weights-form">
+            <div class="weights-grid">
+              <!-- Plagiarism Weight -->
+              <div class="weight-slider-card weight-card-plagiarism">
+                <div class="weight-card-head">
+                  <div class="weight-icon-wrap weight-icon-plagiarism">
+                    <i class="fa-solid fa-copy"></i>
+                  </div>
+                  <div class="weight-titles">
+                    <h3>Plagiarism</h3>
+                    <span class="weight-sub">Verbatim n-gram matching</span>
+                  </div>
+                  <span class="weight-display mono" id="display-plagiarism">0.30</span>
+                </div>
+                <div class="weight-slider-wrap">
+                  <input type="range" class="weight-slider slider-plagiarism" id="slider-plagiarism"
+                         min="0" max="100" value="30" step="1" />
+                  <div class="slider-ticks">
+                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Similarity Weight -->
+              <div class="weight-slider-card weight-card-similarity">
+                <div class="weight-card-head">
+                  <div class="weight-icon-wrap weight-icon-similarity">
+                    <i class="fa-solid fa-diagram-project"></i>
+                  </div>
+                  <div class="weight-titles">
+                    <h3>Similarity</h3>
+                    <span class="weight-sub">Cosine embedding match</span>
+                  </div>
+                  <span class="weight-display mono" id="display-similarity">0.25</span>
+                </div>
+                <div class="weight-slider-wrap">
+                  <input type="range" class="weight-slider slider-similarity" id="slider-similarity"
+                         min="0" max="100" value="25" step="1" />
+                  <div class="slider-ticks">
+                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Detection Weight -->
+              <div class="weight-slider-card weight-card-ai">
+                <div class="weight-card-head">
+                  <div class="weight-icon-wrap weight-icon-ai">
+                    <i class="fa-solid fa-robot"></i>
+                  </div>
+                  <div class="weight-titles">
+                    <h3>AI Detection</h3>
+                    <span class="weight-sub">Perplexity & burstiness</span>
+                  </div>
+                  <span class="weight-display mono" id="display-ai">0.25</span>
+                </div>
+                <div class="weight-slider-wrap">
+                  <input type="range" class="weight-slider slider-ai" id="slider-ai"
+                         min="0" max="100" value="25" step="1" />
+                  <div class="slider-ticks">
+                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Manipulation Weight -->
+              <div class="weight-slider-card weight-card-manipulation">
+                <div class="weight-card-head">
+                  <div class="weight-icon-wrap weight-icon-manipulation">
+                    <i class="fa-solid fa-shield-halved"></i>
+                  </div>
+                  <div class="weight-titles">
+                    <h3>Manipulation</h3>
+                    <span class="weight-sub">Metadata & font forensics</span>
+                  </div>
+                  <span class="weight-display mono" id="display-manipulation">0.20</span>
+                </div>
+                <div class="weight-slider-wrap">
+                  <input type="range" class="weight-slider slider-manipulation" id="slider-manipulation"
+                         min="0" max="100" value="20" step="1" />
+                  <div class="slider-ticks">
+                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sum Validation -->
+            <div class="weights-sum-bar">
+              <div class="sum-visual">
+                <div class="sum-track">
+                  <div class="sum-segment sum-seg-plagiarism" id="sum-seg-plagiarism" style="width: 30%;"></div>
+                  <div class="sum-segment sum-seg-similarity" id="sum-seg-similarity" style="width: 25%;"></div>
+                  <div class="sum-segment sum-seg-ai" id="sum-seg-ai" style="width: 25%;"></div>
+                  <div class="sum-segment sum-seg-manipulation" id="sum-seg-manipulation" style="width: 20%;"></div>
+                </div>
+              </div>
+              <div class="sum-info">
+                <span class="sum-label">Total Weight:</span>
+                <span class="sum-value mono" id="weights-sum-value">1.00</span>
+                <span class="sum-status" id="weights-sum-status">
+                  <i class="fa-solid fa-circle-check"></i> Valid
+                </span>
+              </div>
+            </div>
+
+            <div class="weights-actions">
+              <button type="button" class="nav-action-btn" id="btn-reset-weights" title="Reset to default weights">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Reset Defaults</span>
+              </button>
+              <button type="submit" class="nav-action-btn btn-primary" id="btn-save-weights" title="Save weight configuration">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Configuration</span>
+              </button>
+            </div>
+
+            <div class="weights-toast" id="weights-toast" style="display: none;">
+              <i class="fa-solid fa-circle-check"></i>
+              <span id="weights-toast-msg">Weights saved successfully!</span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="dashboard.js?v=1.0"></script>
+</body>
+</html>

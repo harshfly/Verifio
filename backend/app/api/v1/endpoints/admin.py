@@ -1,11 +1,13 @@
 """
-Admin endpoints — Phase 8 (scaffolded now for Phase 6 completeness)
-Aggregate stats and weight configuration management.
+Admin endpoints — Phase 8
+Aggregate stats, weight configuration, and evaluator submissions view.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
+from sqlalchemy.orm import selectinload
+from typing import Optional, List
 
 from app.db.session import get_db
 from app.models.user import User
@@ -57,6 +59,47 @@ async def get_stats(
         "total_submissions": sum(status_counts.values()),
         "total_reports": sum(report_counts.values()),
     }
+
+
+@router.get("/submissions-all")
+async def list_all_submissions(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(500, ge=1, le=1000),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_role("evaluator", "admin")),
+):
+    """List ALL submissions across all users (evaluator/admin only).
+
+    Returns each submission with its associated report score/verdict and
+    submitter info for the dashboard table view.
+    """
+    query = (
+        select(Submission)
+        .options(selectinload(Submission.user), selectinload(Submission.report))
+    )
+    if status_filter:
+        query = query.where(Submission.status == status_filter)
+    query = query.order_by(Submission.uploaded_at.desc()).offset(skip).limit(limit)
+
+    result = await db.execute(query)
+    submissions = result.scalars().all()
+
+    return [
+        {
+            "id": str(sub.id),
+            "title": sub.title,
+            "original_filename": sub.original_filename,
+            "file_type": sub.file_type,
+            "status": sub.status,
+            "uploaded_at": sub.uploaded_at.isoformat() if sub.uploaded_at else None,
+            "user_name": sub.user.name if sub.user else None,
+            "user_email": sub.user.email if sub.user else None,
+            "report_score": float(sub.report.authenticity_score) if sub.report else None,
+            "report_verdict": sub.report.status if sub.report else None,
+        }
+        for sub in submissions
+    ]
 
 
 @router.get("/weight-config", response_model=WeightConfigResponse)
