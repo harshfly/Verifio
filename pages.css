@@ -960,63 +960,153 @@
 }
 
 /* ════════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE (All Devices & Screen Sizes)
    ════════════════════════════════════════════════ */
-@media (max-width: 820px) {
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-  .extras-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .pricing-grid {
-    grid-template-columns: 1fr;
-    max-width: 420px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .faq-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   .nav-pill, .desktop-only { display: none !important; }
   .burger { display: flex; }
   .header {
     justify-content: space-between;
     max-width: 100%;
+    padding: 0 4px;
   }
+}
+
+@media (max-width: 820px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .extras-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 20px;
+  }
+  .faq-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 720px) {
   .logo-btn {
-    width: 48px;
-    height: 48px;
-  }
-  .content-section {
-    padding: 40px 16px 60px;
-  }
-  .timeline {
-    padding-left: 50px;
-  }
-  .timeline-line {
-    left: 22px;
-  }
-  .step-number {
-    left: -50px;
     width: 44px;
     height: 44px;
+  }
+  .content-section {
+    padding: 32px 16px 50px;
+  }
+  .section-header {
+    margin-bottom: 36px;
+  }
+  .section-title {
+    font-size: clamp(28px, 7vw, 48px);
+    margin-bottom: 12px;
+  }
+  .section-subtitle {
+    font-size: 14px;
+  }
+  .timeline {
+    padding-left: 48px;
+  }
+  .timeline-line {
+    left: 20px;
+  }
+  .step-number {
+    left: -48px;
+    width: 42px;
+    height: 42px;
     font-size: 13px;
   }
 }
 
 @media (max-width: 520px) {
+  .content-section {
+    padding: 24px 12px 40px;
+  }
+  .section-badge {
+    font-size: 12px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: clamp(24px, 7.5vw, 36px);
+  }
+  .feature-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
   .extras-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
   .speed-card {
     flex-direction: column;
     text-align: center;
+    padding: 24px 18px;
+  }
+  .speed-badge {
+    margin: 0 auto;
+  }
+  .timeline {
+    padding-left: 0;
+  }
+  .timeline-line {
+    display: none;
+  }
+  .timeline-step {
+    margin-bottom: 20px;
+  }
+  .step-number {
+    position: static;
+    margin-bottom: 12px;
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+  }
+  .step-content {
+    padding: 20px 18px;
+    border-radius: 18px;
+  }
+  .pricing-grid {
+    max-width: 100%;
+  }
+  .pricing-card {
+    padding: 26px 18px;
+    border-radius: 20px;
   }
   .auth-card {
-    padding: 28px 20px;
+    padding: 26px 18px;
+    border-radius: 20px;
+    max-width: 100%;
+  }
+  .auth-section {
+    padding: 24px 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .social-buttons {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .feature-score-preview {
+    flex-wrap: wrap;
+  }
+  .step-modules, .step-tags, .score-bands {
+    gap: 4px;
+  }
+  .pricing-plan {
+    font-size: 20px;
+  }
+  .pricing-amount {
+    font-size: 38px;
   }
 }

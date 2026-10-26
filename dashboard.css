@@ -1218,12 +1218,11 @@ body.dashboard-body {
 
 @media (max-width: 768px) {
   .dash-navbar {
-    padding: 12px 16px;
-    flex-wrap: wrap;
+    padding: 10px 16px;
     gap: 10px;
   }
   .dash-breadcrumbs { display: none; }
-  .dash-main { padding: 20px 16px 48px; }
+  .dash-main { padding: 18px 14px 48px; }
   .stats-cards-grid {
     grid-template-columns: 1fr 1fr;
     gap: 12px;
@@ -1235,14 +1234,14 @@ body.dashboard-body {
     gap: 20px;
   }
   .donut-chart-wrap {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
   }
   .table-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
-    padding: 18px 20px;
+    padding: 16px 18px;
   }
   .table-controls {
     flex-wrap: wrap;
@@ -1253,19 +1252,84 @@ body.dashboard-body {
   .stats-hero-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-navbar {
+    padding: 10px 12px;
+  }
+  .role-badge { display: none; }
+  .dash-nav-right {
+    gap: 6px;
+  }
+  .nav-action-btn span { display: none; }
+  .nav-action-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 10px;
+    justify-content: center;
+  }
+  .weights-card {
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+  .weight-slider-card {
+    padding: 16px 14px;
+  }
+  .formula-code {
+    font-size: 11px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .weights-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .weights-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .table-footer {
+    flex-direction: column;
     gap: 12px;
+    align-items: center;
+    text-align: center;
+    padding: 14px 16px;
   }
 }
 
 @media (max-width: 480px) {
+  .dash-main {
+    padding: 14px 10px 40px;
+  }
   .stats-cards-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .chart-card {
+    padding: 18px 16px;
+    border-radius: 18px;
   }
   .bar-chart-wrap {
-    gap: 20px;
-    height: 160px;
+    gap: 16px;
+    height: 150px;
   }
-  .dash-nav-right span { display: none; }
+  .donut-chart-wrap {
+    width: 130px;
+    height: 130px;
+  }
+  .table-section {
+    border-radius: 18px;
+  }
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────

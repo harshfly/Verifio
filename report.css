@@ -1205,22 +1205,103 @@ mark.flagged-mark.is-active {
   .report-breadcrumbs {
     display: none;
   }
+  .report-main {
+    padding: 20px 14px 48px;
+  }
   .meta-summary-box {
     grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
   .module-cards-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
   .workbench-header {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
   .filter-pills {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
   }
   .evidence-inspector-panel {
     border-radius: 16px;
     margin-top: 12px;
+    max-height: 480px;
+  }
+}
+
+@media (max-width: 640px) {
+  .report-navbar {
+    padding: 10px 12px;
+  }
+  .report-nav-right {
+    gap: 6px;
+  }
+  .report-nav-right .nav-action-btn span {
+    display: none;
+  }
+  .report-nav-right .nav-action-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 10px;
+    justify-content: center;
+  }
+  .report-hero-card {
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+  .document-title {
+    font-size: 18px;
+  }
+  .report-footer-cert {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-main {
+    padding: 14px 10px 40px;
+  }
+  .meta-summary-box {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .status-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .status-pill #nav-status-text {
+    display: none;
+  }
+  .gauge-wrap {
+    width: 140px;
+    height: 140px;
+  }
+  .gauge-svg {
+    width: 140px;
+    height: 140px;
+  }
+  .gauge-score-value {
+    font-size: 32px;
+  }
+  .module-card {
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+  .document-text-pane {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+  .doc-reader-body {
+    font-size: 13px;
+    line-height: 1.6;
   }
 }
 
