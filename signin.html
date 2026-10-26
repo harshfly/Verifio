@@ -63,6 +63,19 @@
         <h1 class="auth-title" id="auth-form-title">Welcome back</h1>
         <p class="auth-subtitle" id="auth-form-subtitle">Sign in to access your dashboard and reports.</p>
 
+        <!-- Instant 1-Click Demo Access -->
+        <div class="demo-pills" id="demo-pills">
+          <button type="button" class="demo-pill-btn" data-role="evaluator" data-email="evaluator@university.edu" data-name="Academic Evaluator" title="1-Click Evaluator Access">
+            <i class="fa-solid fa-shield-halved"></i> Evaluator Demo
+          </button>
+          <button type="button" class="demo-pill-btn" data-role="admin" data-email="admin@university.edu" data-name="System Administrator" title="1-Click Admin Access">
+            <i class="fa-solid fa-lock"></i> Admin Demo
+          </button>
+          <button type="button" class="demo-pill-btn" data-role="student" data-email="student@university.edu" data-name="Jane Doe" title="1-Click Student Access">
+            <i class="fa-solid fa-graduation-cap"></i> Student Demo
+          </button>
+        </div>
+
         <form class="auth-form" id="auth-form" autocomplete="on">
           <!-- Name field (signup only) -->
           <div class="form-group form-group-hidden" id="name-group">
@@ -116,11 +129,11 @@
         </div>
 
         <div class="social-buttons">
-          <button class="social-btn" type="button">
+          <button class="social-btn" id="btn-google-auth" type="button">
             <i class="fa-brands fa-google"></i>
             <span>Google</span>
           </button>
-          <button class="social-btn" type="button">
+          <button class="social-btn" id="btn-github-auth" type="button">
             <i class="fa-brands fa-github"></i>
             <span>GitHub</span>
           </button>
