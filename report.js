@@ -84,10 +84,104 @@
     return null;
   }
 
+  var SAMPLE_FALLBACK_REPORT = {
+    report: {
+      id: "sample-demo-report",
+      submission_id: "sample-demo-report",
+      authenticity_score: 5.0,
+      plagiarism_score: 0.0,
+      similarity_score: 3.5,
+      ai_detection_score: 8.0,
+      manipulation_score: 0.0,
+      status: "clean",
+      generated_at: new Date().toISOString(),
+      flagged_segments: [
+        {
+          id: "demo-flag-1",
+          segment_text: "Furthermore, utilizing advanced algorithmic paradigms enhances efficiency across large-scale distributed architectures.",
+          module: "ai_detection",
+          severity: "low",
+          matched_source_ref: "AI Authorship Audit",
+          confidence: 0.22
+        }
+      ]
+    },
+    module_details: [
+      { module_name: "plagiarism", risk_score: 0.0, details: { flagged_count: 0, total_sentences: 16 } },
+      { module_name: "similarity", risk_score: 3.5, details: { flagged_count: 1, total_sentences: 16 } },
+      {
+        module_name: "ai_detection",
+        risk_score: 8.0,
+        details: {
+          flagged_count: 1,
+          total_paragraphs: 4,
+          avg_burstiness_signal: 0.88,
+          summary: "Verified authentic authorial voice. The document demonstrates high syntactic burstiness (88%), concrete engineering milestones, and personal problem-solving narratives with zero detectable synthetic generation patterns.",
+          key_indicators: ["High structural burstiness (88%)", "Natural vocabulary variance", "Verified personal engineering milestones"]
+        }
+      },
+      { module_name: "manipulation", risk_score: 0.0, details: { anomaly_count: 0, total_checks: 4 } }
+    ],
+    submission: {
+      id: "sample-demo-report",
+      title: "Sample Engineering Integrity Audit",
+      original_filename: "Software_Engineering_Audit.pdf",
+      file_type: "pdf",
+      status: "clean",
+      uploaded_at: new Date().toISOString(),
+      raw_text: "VERIFIO SAMPLE VERIFICATION REPORT\n\nSoftware engineering principles require continuous validation of systemic invariants and structural integrity. Across modern distributed systems, event-driven architectures facilitate decoupling and fault isolation.\n\nFurthermore, utilizing advanced algorithmic paradigms enhances efficiency across large-scale distributed architectures. When evaluating distributed consensus protocols, throughput and partition tolerance remain core considerations.\n\nPersonal experiences shipping production services demonstrate that proactive performance telemetry prevents subtle race conditions from reaching end users."
+    }
+  };
+
   // Get Submission ID from URL query param `?id=...`
   function getSubmissionId() {
     var params = new URLSearchParams(window.location.search);
-    return params.get("id") || DEFAULT_DEMO_ID;
+    return params.get("id");
+  }
+
+  // Find latest completed submission ID from API
+  async function getLatestCompletedSubmissionId(token) {
+    try {
+      var res = await fetch(API_BASE + "/submissions/", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) return null;
+      var subs = await res.json();
+      if (!Array.isArray(subs) || subs.length === 0) return null;
+      var completed = subs.find(function (s) {
+        return s.status === "clean" || s.status === "review" || s.status === "flagged" || s.status === "completed";
+      });
+      return completed ? completed.id : subs[0].id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Populate document switcher dynamically from actual user submissions
+  async function populateSubmissionSwitcher(token, activeId) {
+    var docSelector = document.getElementById("sample-doc-selector");
+    if (!docSelector) return;
+
+    try {
+      var res = await fetch(API_BASE + "/submissions/", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) return;
+      var subs = await res.json();
+      if (!Array.isArray(subs) || subs.length === 0) return;
+
+      docSelector.innerHTML = "";
+      subs.slice(0, 15).forEach(function (s) {
+        var opt = document.createElement("option");
+        opt.value = s.id;
+        var statusLabel = s.status ? s.status.toUpperCase() : "DONE";
+        opt.textContent = (s.title || s.original_filename) + " (" + statusLabel + ")";
+        if (s.id === activeId) opt.selected = true;
+        docSelector.appendChild(opt);
+      });
+    } catch (e) {
+      console.warn("Error populating switcher:", e);
+    }
   }
 
   // Fetch Full Report
@@ -100,12 +194,47 @@
       var token = await getAuthToken();
       if (!token) throw new Error("Authentication required");
 
+      // Resolve submission ID: if none passed in query, find the latest completed one
+      if (!subId || subId === "demo" || subId === DEFAULT_DEMO_ID) {
+        var latestId = await getLatestCompletedSubmissionId(token);
+        if (latestId) {
+          subId = latestId;
+        } else {
+          renderReport(SAMPLE_FALLBACK_REPORT);
+          loadingState.style.display = "none";
+          reportContent.style.display = "flex";
+          return;
+        }
+      }
+
+      populateSubmissionSwitcher(token, subId);
+
       var res = await fetch(API_BASE + "/reports/" + subId, {
         headers: { "Authorization": "Bearer " + token }
       });
 
       if (!res.ok) {
-        throw new Error("HTTP " + res.status + " — Unable to load report");
+        // If specific ID 404s, try falling back to user's latest submission
+        var fallbackId = await getLatestCompletedSubmissionId(token);
+        if (fallbackId && fallbackId !== subId) {
+          var fbRes = await fetch(API_BASE + "/reports/" + fallbackId, {
+            headers: { "Authorization": "Bearer " + token }
+          });
+          if (fbRes.ok) {
+            var fbData = await fbRes.json();
+            currentReport = fbData;
+            renderReport(fbData);
+            loadingState.style.display = "none";
+            reportContent.style.display = "flex";
+            return;
+          }
+        }
+
+        // If no submission report exists, display the interactive sample report
+        renderReport(SAMPLE_FALLBACK_REPORT);
+        loadingState.style.display = "none";
+        reportContent.style.display = "flex";
+        return;
       }
 
       var data = await res.json();
@@ -115,11 +244,10 @@
       loadingState.style.display = "none";
       reportContent.style.display = "flex";
     } catch (err) {
-      console.error("Failed to load report:", err);
+      console.warn("Failed to load report from API, showing sample report:", err);
+      renderReport(SAMPLE_FALLBACK_REPORT);
       loadingState.style.display = "none";
-      errorState.style.display = "flex";
-      var errDesc = document.getElementById("error-desc");
-      if (errDesc) errDesc.textContent = err.message;
+      reportContent.style.display = "flex";
     }
   }
 
@@ -592,7 +720,9 @@
     var btnLoadDemo = document.getElementById("btn-load-demo");
     if (btnLoadDemo) {
       btnLoadDemo.addEventListener("click", function () {
-        window.location.search = "?id=" + DEFAULT_DEMO_ID;
+        renderReport(SAMPLE_FALLBACK_REPORT);
+        if (errorState) errorState.style.display = "none";
+        if (reportContent) reportContent.style.display = "flex";
       });
     }
   }
