@@ -37,6 +37,9 @@ storage/
 # Database & Docker Volumes
 postgres_data/
 storage_data/
+*.db
+*.sqlite
+*.sqlite3
 
 # Environment files
 .env
