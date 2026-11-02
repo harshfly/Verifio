@@ -2,7 +2,7 @@
 Submission endpoints — Phases 2 & 4
 Upload, list, detail, status polling, and delete.
 """
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
@@ -10,6 +10,7 @@ from typing import List, Optional
 import hashlib
 import uuid
 import os
+import logging
 
 from app.db.session import get_db
 from app.models.user import User
@@ -22,6 +23,8 @@ from app.schemas.submission import (
 from app.api.v1.endpoints.auth import get_current_user
 from app.services.storage import storage_service
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -36,6 +39,7 @@ def _get_file_type(filename: str) -> str:
 
 @router.post("/", response_model=SubmissionResponse, status_code=status.HTTP_201_CREATED)
 async def upload_document(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     title: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
@@ -87,14 +91,23 @@ async def upload_document(
     await db.commit()
     await db.refresh(submission)
 
-    # Dispatch async processing task
+    # Dispatch processing task (Celery if available, otherwise FastAPI BackgroundTasks)
+    dispatched_celery = False
     try:
-        from app.tasks.celery_worker import process_submission_task
+        from app.tasks.celery_worker import celery_app, process_submission_task
+        # Quick ping to check if Redis broker is reachable
+        with celery_app.connection_for_write() as conn:
+            conn.connect()
         process_submission_task.delay(str(submission_id), file_path)
+        dispatched_celery = True
+        logger.info(f"Dispatched submission {submission_id} via Celery worker")
     except Exception as e:
-        # If Celery/Redis is unavailable, log but don't fail the upload
-        import logging
-        logging.getLogger(__name__).warning(f"Failed to dispatch Celery task: {e}")
+        logger.info(f"Celery worker unavailable ({e}), using FastAPI BackgroundTasks fallback")
+
+    if not dispatched_celery:
+        from app.tasks.celery_worker import _process_async
+        background_tasks.add_task(_process_async, str(submission_id), file_path)
+        logger.info(f"Dispatched submission {submission_id} via FastAPI BackgroundTasks")
 
     return submission
 

@@ -26,6 +26,7 @@ async def get_current_user(
 ) -> User:
     """Decode JWT and return the current user, or 401."""
     from jose import JWTError, jwt
+    import uuid as _uuid
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -34,10 +35,11 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
+        user_id_str: str = payload.get("sub")
+        if user_id_str is None:
             raise credentials_exception
-    except JWTError:
+        user_id = _uuid.UUID(user_id_str)
+    except (JWTError, ValueError):
         raise credentials_exception
 
     result = await db.execute(select(User).where(User.id == user_id))

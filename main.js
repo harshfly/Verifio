@@ -269,13 +269,24 @@
     }
   }
 
-  // Ensure authenticated token (auto-login demo user if not logged in)
+  // Ensure authenticated token (validates existing token, or auto-logins / auto-provisions demo user)
   async function getAuthToken() {
     var token = localStorage.getItem("verifio_token");
-    if (token) return token;
+    if (token) {
+      try {
+        var meRes = await fetch("http://localhost:8000/api/v1/auth/me", {
+          headers: { "Authorization": "Bearer " + token }
+        });
+        if (meRes.ok) return token;
+      } catch (e) {
+        console.warn("Token check error, continuing...", e);
+      }
+      // If token is invalid, stale, or rejected, clear it
+      localStorage.removeItem("verifio_token");
+    }
 
     try {
-      // Auto-login to existing test account
+      // Auto-login to default test account
       var formData = new URLSearchParams();
       formData.append("username", "harsh@example.com");
       formData.append("password", "securepassword123");
@@ -290,9 +301,33 @@
         var data = await res.json();
         localStorage.setItem("verifio_token", data.access_token);
         return data.access_token;
+      } else if (res.status === 401 || res.status === 404) {
+        // Auto-provision demo account if DB is fresh
+        var regRes = await fetch("http://localhost:8000/api/v1/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: "harsh@example.com",
+            password: "securepassword123",
+            name: "Harsh Malviya",
+            role: "evaluator"
+          })
+        });
+        if (regRes.ok) {
+          var retryLogin = await fetch("http://localhost:8000/api/v1/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+          });
+          if (retryLogin.ok) {
+            var retryData = await retryLogin.json();
+            localStorage.setItem("verifio_token", retryData.access_token);
+            return retryData.access_token;
+          }
+        }
       }
     } catch (e) {
-      console.warn("Auto-login failed:", e);
+      console.warn("Auto-login / provision failed:", e);
     }
     return null;
   }
@@ -339,9 +374,22 @@
         body: uploadData
       });
 
+      // Handle stale/expired token automatically
+      if (uploadRes.status === 401) {
+        localStorage.removeItem("verifio_token");
+        token = await getAuthToken();
+        if (token) {
+          uploadRes = await fetch("http://localhost:8000/api/v1/submissions/", {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + token },
+            body: uploadData
+          });
+        }
+      }
+
       if (!uploadRes.ok) {
-        var errJson = await uploadRes.json();
-        throw new Error(errJson.detail || "Upload failed");
+        var errJson = await uploadRes.json().catch(function () { return {}; });
+        throw new Error(errJson.detail || "Upload failed (status " + uploadRes.status + ")");
       }
 
       var submission = await uploadRes.json();
@@ -392,6 +440,7 @@
       }, 1500);
 
     } catch (err) {
+      console.error("Upload error:", err);
       alert("Error: " + err.message);
       resetUploadUI();
     }

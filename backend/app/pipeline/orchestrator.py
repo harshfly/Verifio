@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.pipeline.preprocessing import preprocess_document
-from app.pipeline.plagiarism import detect_plagiarism
+from app.pipeline.plagiarism import detect_plagiarism, detect_plagiarism_enhanced
 from app.pipeline.similarity import detect_similarity
 from app.pipeline.ai_detection import detect_ai_content
 from app.pipeline.manipulation import detect_manipulation
@@ -106,7 +106,7 @@ async def run_pipeline(
         # ── Step 3: Run detection modules ────────────────────────────────
         logger.info(f"[{submission_id}] Running detection modules...")
 
-        plagiarism_result = detect_plagiarism(processed.sentences, corpus)
+        plagiarism_result = await detect_plagiarism_enhanced(processed.clean_text, processed.sentences, corpus)
         similarity_result = detect_similarity(processed.sentences, corpus)
         ai_result = await detect_ai_content(processed.clean_text, processed.sentences)
         manipulation_result = detect_manipulation(processed.metadata)

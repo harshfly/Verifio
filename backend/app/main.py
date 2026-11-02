@@ -39,6 +39,38 @@ async def startup_event():
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables created / verified")
 
+    # Seed default demo users for local zero-setup usage
+    from app.db.session import AsyncSessionLocal
+    from app.models.user import User
+    from app.core.security import get_password_hash
+    from sqlalchemy.future import select
+    import uuid
+
+    demo_users = [
+        ("harsh@example.com", "Harsh Malviya", "securepassword123", "evaluator"),
+        ("evaluator@university.edu", "Dr. Sarah Chen", "demo12345", "evaluator"),
+        ("admin@verifio.internal", "System Administrator", "demo12345", "admin"),
+        ("student@university.edu", "Alex Johnson", "demo12345", "student"),
+    ]
+
+    try:
+        async with AsyncSessionLocal() as session:
+            for email, name, password, role in demo_users:
+                res = await session.execute(select(User).where(User.email == email))
+                if not res.scalars().first():
+                    user = User(
+                        id=uuid.uuid4(),
+                        email=email,
+                        name=name,
+                        password_hash=get_password_hash(password),
+                        role=role,
+                    )
+                    session.add(user)
+            await session.commit()
+        logger.info("Default demo users verified and seeded")
+    except Exception as e:
+        logger.warning(f"Error seeding demo users: {e}")
+
 
 @app.get("/health", tags=["system"])
 async def health_check():

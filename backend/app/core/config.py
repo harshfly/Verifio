@@ -11,7 +11,13 @@ class Settings(BaseSettings):
     STORAGE_DIR: str = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "storage")
     UPLOAD_MAX_SIZE_MB: int = 50
 
+    # Grok AI (xAI) API configuration
+    GROK_API_KEY: str = ""
+    GROK_BASE_URL: str = "https://api.x.ai/v1"
+    GROK_MODEL: str = "grok-3-mini-fast"
+
     class Config:
         env_file = ".env"
 
 settings = Settings()
+

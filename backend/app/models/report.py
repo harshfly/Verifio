@@ -1,3 +1,4 @@
+from datetime import datetime, timezone as tz
 import uuid
 from sqlalchemy import Column, String, DateTime, func, ForeignKey, Numeric, Uuid, JSON
 from sqlalchemy.orm import relationship
@@ -20,7 +21,7 @@ class Report(Base):
     weight_config_json = Column(JSON)           # weights used for this run
     status = Column(String, nullable=False)      # clean | review | flagged
 
-    generated_at = Column(DateTime(timezone=True), default=func.now)
+    generated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(tz.utc), server_default=func.now())
 
     submission = relationship("Submission", back_populates="report")
     flagged_segments = relationship("FlaggedSegment", back_populates="report", cascade="all, delete-orphan")

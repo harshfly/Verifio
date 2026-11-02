@@ -1,3 +1,4 @@
+from datetime import datetime, timezone as tz
 import uuid
 from sqlalchemy import Column, String, DateTime, func, ForeignKey, Uuid
 from sqlalchemy.orm import relationship
@@ -16,7 +17,7 @@ class Submission(Base):
     file_hash = Column(String, nullable=False)
     raw_text = Column(String, nullable=True)               # populated after preprocessing
     status = Column(String, nullable=False, default="pending")  # pending | processing | completed | failed
-    uploaded_at = Column(DateTime(timezone=True), default=func.now)
+    uploaded_at = Column(DateTime(timezone=True), default=lambda: datetime.now(tz.utc), server_default=func.now())
     processed_at = Column(DateTime(timezone=True), nullable=True)
 
     user = relationship("User", back_populates="submissions")

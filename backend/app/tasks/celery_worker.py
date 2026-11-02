@@ -58,21 +58,17 @@ def process_submission_task(self, submission_id: str, file_path: str):
 
 async def _process_async(submission_id: str, file_path: str):
     """Async wrapper that creates a fresh DB session and runs the pipeline."""
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-    from sqlalchemy.pool import NullPool
     from app.pipeline.orchestrator import run_pipeline
+    from app.db.session import AsyncSessionLocal
 
     # Normalize file path for current OS environment
     file_path = file_path.replace("\\", "/")
 
-    # Create fresh engine with NullPool so asyncpg doesn't share connections across event loops
-    worker_engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
-    WorkerSession = async_sessionmaker(worker_engine, class_=AsyncSession, expire_on_commit=False)
-
     try:
-        async with WorkerSession() as db:
+        async with AsyncSessionLocal() as db:
             result = await run_pipeline(submission_id, file_path, db)
             logger.info(f"[Task] Pipeline result: {result}")
             return result
-    finally:
-        await worker_engine.dispose()
+    except Exception as e:
+        logger.error(f"[Task] Pipeline execution error: {e}", exc_info=True)
+        raise

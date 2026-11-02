@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import uuid
 from sqlalchemy import Column, String, DateTime, func, Uuid
 from sqlalchemy.orm import relationship
@@ -12,6 +13,6 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False, default="student")  # student | evaluator | admin
-    created_at = Column(DateTime(timezone=True), default=func.now)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), server_default=func.now())
 
     submissions = relationship("Submission", back_populates="user", cascade="all, delete-orphan")
