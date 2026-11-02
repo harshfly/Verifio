@@ -71,22 +71,34 @@ def compute_final_score(
     ai = max(0.0, min(100.0, ai_detection_score))
     manip = max(0.0, min(100.0, manipulation_score))
 
-    # Weighted sum
-    final = (
+    # Base weighted sum
+    weighted_sum = (
         w["plagiarism"] * plag +
         w["similarity"] * sim +
         w["ai_detection"] * ai +
         w["manipulation"] * manip
     )
+
+    # Dominant Threat Guardrail:
+    # If any single dimension has critical or elevated risk (e.g. 75% AI generation),
+    # the overall risk must reflect that vulnerability rather than being washed out to ~18%.
+    max_threat = max(plag, sim, ai, manip)
+    if max_threat >= 55.0:
+        final = max(weighted_sum, max_threat * 0.85)
+    elif max_threat >= 30.0:
+        final = max(weighted_sum, max_threat * 0.70)
+    else:
+        final = weighted_sum
     final = round(final, 1)
 
-    # Determine status band
-    if final < THRESHOLD_CLEAN:
-        status = "clean"
-    elif final < THRESHOLD_REVIEW:
+    # Determine status band with explicit guardrails:
+    # A submission CANNOT be labeled "clean" if AI is >= 25% or Plagiarism >= 20%
+    if final >= THRESHOLD_REVIEW or ai >= 55.0 or plag >= 45.0 or sim >= 55.0 or manip >= 50.0:
+        status = "flagged"
+    elif final >= THRESHOLD_CLEAN or ai >= 25.0 or plag >= 20.0 or sim >= 30.0 or manip >= 25.0:
         status = "review"
     else:
-        status = "flagged"
+        status = "clean"
 
     breakdown = {
         "plagiarism": {"score": plag, "weight": w["plagiarism"], "contribution": round(w["plagiarism"] * plag, 1)},

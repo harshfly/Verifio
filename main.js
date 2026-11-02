@@ -464,8 +464,33 @@
     var rep = data.report || {};
     var modules = data.module_details || [];
     var riskScore = Math.round(rep.authenticity_score !== undefined ? rep.authenticity_score : 0);
-    var originalityScore = Math.max(0, 100 - riskScore);
     var status = (rep.status || "clean").toLowerCase();
+
+    // Extract individual module scores to ensure total alignment between badge & card details
+    var aiScore = 0;
+    var plagScore = 0;
+    var simScore = 0;
+    var manipScore = 0;
+
+    modules.forEach(function (m) {
+      var s = Math.round(m.risk_score || 0);
+      if (m.module_name === "ai_detection") aiScore = s;
+      else if (m.module_name === "plagiarism") plagScore = s;
+      else if (m.module_name === "similarity") simScore = s;
+      else if (m.module_name === "manipulation") manipScore = s;
+    });
+
+    // Guardrail: If any module is critically high, elevate status & riskScore
+    var peakThreat = Math.max(aiScore, plagScore, simScore, manipScore);
+    if (peakThreat >= 55) {
+      status = "flagged";
+      riskScore = Math.max(riskScore, Math.round(peakThreat * 0.85));
+    } else if (peakThreat >= 25) {
+      if (status === "clean") status = "review";
+      riskScore = Math.max(riskScore, Math.round(peakThreat * 0.70));
+    }
+
+    var originalityScore = Math.max(0, 100 - riskScore);
 
     if (reportDocTitle) {
       reportDocTitle.textContent = fileName + " • " + new Date().toLocaleTimeString();
@@ -476,16 +501,26 @@
     var strokeColor = "#22c55e";
     var scoreDesc = "Verified Authentic Work. Overall risk index is " + riskScore + "% across Plagiarism, Semantic Similarity, AI Synthesizer, and Document Forensics.";
 
-    if (status === "review" || (riskScore >= 25 && riskScore < 60)) {
-      badgeClass = "badge-review";
-      badgeText = "Review Recommended (" + riskScore + "% Risk)";
-      strokeColor = "#f59e0b";
-      scoreDesc = "Moderate elevated indicators detected. Originality estimated at " + originalityScore + "%. Institutional review recommended.";
-    } else if (status === "flagged" || riskScore >= 60) {
+    if (aiScore >= 55) {
+      badgeClass = "badge-flagged";
+      badgeText = "Flagged: High AI Content (" + aiScore + "%)";
+      strokeColor = "#ef4444";
+      scoreDesc = "High probability of AI-generated content detected (" + aiScore + "% AI Generation Probability). Comprehensive human evaluation required.";
+    } else if (plagScore >= 45) {
+      badgeClass = "badge-flagged";
+      badgeText = "Flagged: Plagiarism Risk (" + plagScore + "%)";
+      strokeColor = "#ef4444";
+      scoreDesc = "Significant verbatim text overlap detected (" + plagScore + "% Plagiarism Risk). Source attribution review required.";
+    } else if (status === "flagged" || riskScore >= 55) {
       badgeClass = "badge-flagged";
       badgeText = "Flagged Anomalies (" + riskScore + "% Risk)";
       strokeColor = "#ef4444";
       scoreDesc = "High probability of AI-generated content or substantial similarity overlap detected (" + riskScore + "% Risk Index).";
+    } else if (aiScore >= 25 || plagScore >= 20 || status === "review" || riskScore >= 25) {
+      badgeClass = "badge-review";
+      badgeText = "Review Recommended (" + (aiScore >= 25 ? aiScore + "% AI" : riskScore + "% Risk") + ")";
+      strokeColor = "#f59e0b";
+      scoreDesc = "Moderate elevated indicators detected (" + (aiScore >= 25 ? aiScore + "% AI Generation" : riskScore + "% Risk") + "). Institutional review recommended.";
     }
 
     var strokeDashoffset = 251.2 - (251.2 * originalityScore) / 100;

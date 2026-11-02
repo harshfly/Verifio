@@ -274,6 +274,21 @@
       certHash.textContent = "sha256:" + (sub.id ? sub.id.replace(/-/g, "") : "00000000000000000000000000000000");
     }
 
+    var pScore = Math.round(rep.plagiarism_score || 0);
+    var sScore = Math.round(rep.similarity_score || 0);
+    var aScore = Math.round(rep.ai_detection_score || 0);
+    var mScore = Math.round(rep.manipulation_score || 0);
+
+    // Apply dominant threat guardrails so high AI or Plagiarism cannot be masked
+    var peakThreat = Math.max(pScore, sScore, aScore, mScore);
+    if (peakThreat >= 55) {
+      status = "flagged";
+      score = Math.max(score, Math.round(peakThreat * 0.85));
+    } else if (peakThreat >= 25) {
+      if (status === "clean") status = "review";
+      score = Math.max(score, Math.round(peakThreat * 0.70));
+    }
+
     // Top Status Pill
     if (navStatusPill && navStatusText) {
       navStatusPill.className = "status-pill status-" + status;
@@ -281,7 +296,7 @@
     }
 
     // 1) ScoreGauge Hero Component
-    animateGauge(score, status);
+    animateGauge(score, status, rep);
 
     // 2) Module Breakdown Cards
     renderModuleCards(rep, modules, allFlaggedSegments);
@@ -299,7 +314,7 @@
   }
 
   // Animate Circular Gauge
-  function animateGauge(riskScore, status) {
+  function animateGauge(riskScore, status, rep) {
     if (!gaugeFill || !gaugeScoreVal) return;
 
     var originalityScore = Math.max(0, 100 - riskScore);
@@ -307,25 +322,40 @@
     var totalCircumference = 427.26;
     var offset = totalCircumference - (totalCircumference * (originalityScore / 100));
 
+    var pScore = rep ? Math.round(rep.plagiarism_score || 0) : 0;
+    var aScore = rep ? Math.round(rep.ai_detection_score || 0) : 0;
+
     // Color ramp based on status & riskScore
     var strokeColor = "#22c55e"; // clean
     var badgeClass = "verdict-badge verdict-clean";
     var iconClass = "fa-solid fa-circle-check";
-    var verdictTitle = "Clean & Authentic (100% Original)";
-    var verdictExpl = "All 4 detection modules passed institutional authenticity benchmarks with 0% risk detected.";
+    var verdictTitle = "Clean & Authentic (" + originalityScore + "% Original)";
+    var verdictExpl = "All 4 detection modules passed institutional authenticity benchmarks with minimal risk detected.";
 
-    if (status === "review" || (riskScore >= 25 && riskScore < 60)) {
-      strokeColor = "#f59e0b";
-      badgeClass = "verdict-badge verdict-review";
+    if (aScore >= 55) {
+      strokeColor = "#ef4444";
+      badgeClass = "verdict-badge verdict-flagged";
       iconClass = "fa-solid fa-triangle-exclamation";
-      verdictTitle = "Review Recommended (" + riskScore + "% Risk)";
-      verdictExpl = "Originality estimated at " + originalityScore + "%. Moderate elevated indicators detected across scanned sections.";
-    } else if (status === "flagged" || riskScore >= 60) {
+      verdictTitle = "Flagged: High AI Content (" + aScore + "% AI)";
+      verdictExpl = "Elevated synthetic patterns detected with " + aScore + "% AI generation probability across passages. Academic integrity review required.";
+    } else if (pScore >= 45) {
+      strokeColor = "#ef4444";
+      badgeClass = "verdict-badge verdict-flagged";
+      iconClass = "fa-solid fa-triangle-exclamation";
+      verdictTitle = "Flagged: Plagiarism Match (" + pScore + "% Match)";
+      verdictExpl = "Substantial verbatim overlap detected with indexed sources. Human attribution verification required.";
+    } else if (status === "flagged" || riskScore >= 55) {
       strokeColor = "#ef4444";
       badgeClass = "verdict-badge verdict-flagged";
       iconClass = "fa-solid fa-circle-xmark";
       verdictTitle = "Flagged Anomalies (" + riskScore + "% Risk)";
       verdictExpl = "Originality estimated at " + originalityScore + "%. Substantial verbatim overlap or synthetic generation patterns detected.";
+    } else if (aScore >= 25 || pScore >= 20 || status === "review" || riskScore >= 25) {
+      strokeColor = "#f59e0b";
+      badgeClass = "verdict-badge verdict-review";
+      iconClass = "fa-solid fa-triangle-exclamation";
+      verdictTitle = "Review Recommended (" + (aScore >= 25 ? aScore + "% AI" : riskScore + "% Risk") + ")";
+      verdictExpl = "Originality estimated at " + originalityScore + "%. Moderate elevated indicators detected across scanned sections.";
     }
 
     gaugeFill.style.stroke = strokeColor;
