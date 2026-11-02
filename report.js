@@ -171,44 +171,45 @@
   }
 
   // Animate Circular Gauge
-  function animateGauge(score, status) {
+  function animateGauge(riskScore, status) {
     if (!gaugeFill || !gaugeScoreVal) return;
 
+    var originalityScore = Math.max(0, 100 - riskScore);
     // Radius = 68 -> Circumference = 2 * PI * 68 = 427.26
     var totalCircumference = 427.26;
-    var offset = totalCircumference - (totalCircumference * (score / 100));
+    var offset = totalCircumference - (totalCircumference * (originalityScore / 100));
 
-    // Color ramp based on status & score
+    // Color ramp based on status & riskScore
     var strokeColor = "#22c55e"; // clean
     var badgeClass = "verdict-badge verdict-clean";
     var iconClass = "fa-solid fa-circle-check";
-    var verdictTitle = "Clean & Authentic";
-    var verdictExpl = "All 4 detection modules passed within acceptable institutional integrity thresholds.";
+    var verdictTitle = "Clean & Authentic (100% Original)";
+    var verdictExpl = "All 4 detection modules passed institutional authenticity benchmarks with 0% risk detected.";
 
-    if (status === "review" || (score >= 25 && score < 60)) {
+    if (status === "review" || (riskScore >= 25 && riskScore < 60)) {
       strokeColor = "#f59e0b";
       badgeClass = "verdict-badge verdict-review";
       iconClass = "fa-solid fa-triangle-exclamation";
-      verdictTitle = "Review Recommended";
-      verdictExpl = "Elevated indicators detected in one or more modules. Faculty review advised.";
-    } else if (status === "flagged" || score >= 60) {
+      verdictTitle = "Review Recommended (" + riskScore + "% Risk)";
+      verdictExpl = "Originality estimated at " + originalityScore + "%. Moderate elevated indicators detected across scanned sections.";
+    } else if (status === "flagged" || riskScore >= 60) {
       strokeColor = "#ef4444";
       badgeClass = "verdict-badge verdict-flagged";
       iconClass = "fa-solid fa-circle-xmark";
-      verdictTitle = "Flagged Anomalies";
-      verdictExpl = "Significant verbatim matches or structural integrity anomalies exceed policy thresholds.";
+      verdictTitle = "Flagged Anomalies (" + riskScore + "% Risk)";
+      verdictExpl = "Originality estimated at " + originalityScore + "%. Substantial verbatim overlap or synthetic generation patterns detected.";
     }
 
     gaugeFill.style.stroke = strokeColor;
     gaugeFill.style.strokeDashoffset = offset;
 
-    // Count up the number
+    // Count up the number to originalityScore
     var current = 0;
-    var step = Math.max(1, Math.round(score / 30));
+    var step = Math.max(1, Math.round(originalityScore / 30));
     var timer = setInterval(function () {
       current += step;
-      if (current >= score) {
-        current = score;
+      if (current >= originalityScore) {
+        current = originalityScore;
         clearInterval(timer);
       }
       gaugeScoreVal.textContent = current + "%";

@@ -97,8 +97,9 @@ async def _grok_plagiarism_analysis(text: str, corpus_texts: list[dict]) -> list
                         "If NO corpus documents are available, analyze the text for signs of "
                         "common plagiarism patterns (overly generic academic phrasing, inconsistent "
                         "writing style suggesting copy-paste from multiple sources).\n\n"
-                        "Respond with ONLY a valid JSON object:\n"
-                        '{"flagged_passages": [{"text": "<flagged excerpt max 200 chars>", '
+                        "Flag at most 3 passages if significant plagiarism is found. If clean, return empty array [].\n"
+                        "Respond with ONLY a valid JSON object, no markdown:\n"
+                        '{"flagged_passages": [{"text": "<flagged excerpt max 120 chars>", '
                         '"confidence": <0.0-1.0>, "match_type": "paraphrase|mosaic|structural", '
                         '"matched_source": "<source doc id or description>", '
                         '"reasoning": "<brief explanation>"}], '
@@ -114,7 +115,7 @@ async def _grok_plagiarism_analysis(text: str, corpus_texts: list[dict]) -> list
                 },
             ],
             temperature=0.1,
-            max_tokens=600,
+            max_tokens=1000,
         )
 
         content = response.choices[0].message.content.strip()

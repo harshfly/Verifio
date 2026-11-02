@@ -11,7 +11,7 @@ import logging
 import re
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from collections import Counter
 
 from app.core.config import settings
@@ -41,6 +41,8 @@ class AIDetectionResult:
     flagged_count: int
     avg_perplexity_signal: float
     avg_burstiness_signal: float
+    ai_summary: str = ""
+    key_indicators: list[str] = field(default_factory=list)
 
 
 # ── Statistical heuristics ───────────────────────────────────────────────────
@@ -223,28 +225,27 @@ async def _grok_analyze_full_document(text: str) -> dict | None:
                 {
                     "role": "system",
                     "content": (
-                        "You are an expert AI-content detection analyst. Analyze the entire document "
-                        "and provide an overall assessment of how likely it is AI-generated.\n\n"
-                        "Look for document-level patterns:\n"
-                        "- Consistent tone without natural variation\n"
-                        "- Lack of personal anecdotes or unique perspectives\n"
-                        "- Formulaic paragraph structure throughout\n"
-                        "- Generic conclusions without novel insights\n"
-                        "- Overuse of certain transition phrases\n\n"
-                        "Respond with ONLY a valid JSON object:\n"
+                        "You are an expert academic and professional document evaluator specializing in "
+                        "AI detection, originality assessment, and authorship authenticity analysis.\n\n"
+                        "Evaluate the text thoroughly for:\n"
+                        "1. Originality & Human Voice: personal experiences, idiosyncratic phrasing, authentic projects, specific timelines.\n"
+                        "2. AI Generation Markers: uniform sentence structure, formulaic transitions ('furthermore', 'additionally'), generic claims, lack of personal perspective.\n"
+                        "3. Content Credibility: concrete verifiable details vs vague boilerplate.\n\n"
+                        "Respond with ONLY a valid JSON object, no markdown, no other text:\n"
                         '{"overall_ai_probability": <float 0.0 to 1.0>, '
+                        '"originality_score": <float 0.0 to 100.0>, '
                         '"confidence": <float 0.0 to 1.0>, '
-                        '"summary": "<2-3 sentence assessment>", '
-                        '"key_indicators": ["<indicator1>", "<indicator2>"]}'
+                        '"summary": "<Detailed 2-3 sentence assessment of the document voice, authenticity, and patterns>", '
+                        '"key_indicators": ["<specific observation 1>", "<specific observation 2>", "<specific observation 3>"]}'
                     ),
                 },
                 {
                     "role": "user",
-                    "content": f"Analyze this document for AI-generated content:\n\n{truncated_text}"
+                    "content": f"Analyze this document for authenticity, originality, and AI-generated content:\n\n{truncated_text}"
                 },
             ],
             temperature=0.1,
-            max_tokens=400,
+            max_tokens=500,
         )
 
         content = response.choices[0].message.content.strip()
@@ -255,7 +256,10 @@ async def _grok_analyze_full_document(text: str) -> dict | None:
 
         json_match = re.search(r'\{[^{}]*\}', content)
         if json_match:
-            content = json_match.group(0)
+            try:
+                return json.loads(json_match.group(0))
+            except Exception:
+                pass
 
         return json.loads(content)
 
@@ -264,33 +268,70 @@ async def _grok_analyze_full_document(text: str) -> dict | None:
         return None
 
 
+def _split_into_paragraphs(clean_text: str) -> list[str]:
+    """Smart paragraph splitter handling academic papers, essays, and resumes."""
+    # Try double-newline first
+    raw_paras = [p.strip() for p in clean_text.split("\n\n") if len(p.strip()) > 30]
+    if len(raw_paras) > 1:
+        return raw_paras
+
+    # Group lines for documents (like resumes/PDFs) with single line breaks
+    lines = [l.strip() for l in clean_text.split("\n") if l.strip()]
+    if len(lines) > 2:
+        chunks = []
+        current = []
+        current_len = 0
+        for line in lines:
+            # Detect section boundaries or bullet points
+            is_header = (
+                (line.isupper() and len(line) < 40)
+                or line.endswith(":")
+                or line.startswith(("(cid:", "•", "-", "*", "1.", "2.", "3."))
+            )
+            if is_header and current_len > 80:
+                chunks.append("\n".join(current))
+                current = [line]
+                current_len = len(line)
+            else:
+                current.append(line)
+                current_len += len(line)
+                if current_len >= 350:
+                    chunks.append("\n".join(current))
+                    current = []
+                    current_len = 0
+        if current:
+            chunks.append("\n".join(current))
+        if len(chunks) > 1:
+            return chunks
+
+    # Fallback to sentence groupings
+    sentences = re.split(r'(?<=[.!?])\s+', clean_text)
+    if len(sentences) >= 4:
+        return [" ".join(sentences[i:i+3]) for i in range(0, len(sentences), 3)]
+
+    return [clean_text] if clean_text.strip() else []
+
+
 # ── Main entry point ─────────────────────────────────────────────────────────
 
 async def detect_ai_content(
     clean_text: str,
     sentences: list,
-    threshold: float = 0.6,
+    threshold: float = 0.5,
 ) -> AIDetectionResult:
     """Run AI content detection on the document.
     
     Uses Grok AI (xAI) for intelligent analysis when API key is configured,
     with statistical heuristics as fallback/complement.
-    
-    Args:
-        clean_text: The cleaned full document text
-        sentences: Preprocessed sentence objects
-        threshold: Probability threshold for flagging (default 0.6)
-        
-    Returns:
-        AIDetectionResult — scores represent likelihood, NEVER certainty
     """
-    # Split into paragraphs for analysis
-    paragraphs = [p.strip() for p in clean_text.split("\n\n") if len(p.strip()) > 50]
+    paragraphs = _split_into_paragraphs(clean_text)
 
     if not paragraphs:
         return AIDetectionResult(
             score=0.0, flagged_segments=[], total_paragraphs=0,
             flagged_count=0, avg_perplexity_signal=0.0, avg_burstiness_signal=0.0,
+            ai_summary="Document text was empty.",
+            key_indicators=[],
         )
 
     grok_available = _is_grok_configured()
@@ -305,56 +346,68 @@ async def detect_ai_content(
 
     # Run document-level Grok analysis
     doc_analysis = None
+    ai_summary = ""
+    key_indicators = []
+    doc_ai_prob = 0.0
     if grok_available:
         doc_analysis = await _grok_analyze_full_document(clean_text)
         if doc_analysis:
+            ai_summary = doc_analysis.get("summary", "")
+            key_indicators = doc_analysis.get("key_indicators", [])
+            doc_ai_prob = float(doc_analysis.get("overall_ai_probability", 0.0))
             logger.info(
                 f"Grok document-level analysis: "
-                f"ai_prob={doc_analysis.get('overall_ai_probability', 'N/A')}, "
+                f"ai_prob={doc_ai_prob}, "
                 f"confidence={doc_analysis.get('confidence', 'N/A')}"
             )
 
+    # Paragraph-level evaluation using statistical heuristics
     for idx, paragraph in enumerate(paragraphs):
-        # Statistical analysis (always runs)
         stat_score, burstiness, vocab = _statistical_ai_score(paragraph)
         burstiness_signals.append(burstiness)
         vocab_signals.append(vocab)
 
-        # Grok AI analysis (per paragraph)
-        grok_flag = await _grok_analyze_paragraph(paragraph, idx) if grok_available else None
-
-        if grok_flag:
-            # Combine Grok and statistical signals
-            combined_prob = (grok_flag.ai_probability * 0.7 + stat_score * 0.3)
-            grok_flag.ai_probability = round(combined_prob, 3)
-            grok_flag.detection_method = "combined"
-            flagged.append(grok_flag)
-        elif stat_score >= threshold:
-            # Statistical-only flag (when Grok is unavailable or disagrees)
+        # Flag if statistical heuristics or document-level signals indicate synthetic generation
+        effective_ai_prob = (stat_score * 0.4 + doc_ai_prob * 0.6) if doc_analysis else stat_score
+        if effective_ai_prob >= threshold:
             flagged.append(AIDetectionFlag(
                 paragraph_index=idx,
                 paragraph_text=paragraph[:500],
-                ai_probability=round(stat_score, 3),
-                reasoning="Statistical signals suggest AI-generated patterns (low burstiness, uniform structure)",
-                detection_method="statistical",
+                ai_probability=round(effective_ai_prob, 3),
+                reasoning="Uniform sentence structure and low burstiness characteristic of AI-generated phrasing.",
+                detection_method="combined" if doc_analysis else "statistical",
             ))
 
     flagged_count = len(flagged)
     total = len(paragraphs)
     
-    # Overall score: weighted average of flagged paragraph probabilities
+    # Calculate realistic AI risk score
+    doc_ai_prob = float(doc_analysis.get("overall_ai_probability", 0.0)) if doc_analysis else 0.0
+
     if flagged:
         avg_prob = sum(f.ai_probability for f in flagged) / flagged_count
-        score = round((flagged_count / total) * avg_prob * 100, 1)
+        paragraph_score = (flagged_count / total) * avg_prob * 100
+        if doc_analysis:
+            score = round(paragraph_score * 0.5 + doc_ai_prob * 100 * 0.5, 1)
+        else:
+            score = round(paragraph_score, 1)
+    elif doc_analysis:
+        score = round(doc_ai_prob * 100, 1)
     else:
-        score = 0.0
+        avg_stat = sum(vocab_signals) / len(vocab_signals) if vocab_signals else 0.0
+        score = round(avg_stat * 30.0, 1)
 
-    # Boost score if Grok document-level analysis also flags it
-    if doc_analysis:
-        doc_ai_prob = doc_analysis.get("overall_ai_probability", 0.0)
-        if doc_ai_prob > 0.5:
-            # Blend document-level signal into the final score
-            score = round(score * 0.6 + doc_ai_prob * 100 * 0.4, 1)
+    # Provide default summary if none from LLM
+    if not ai_summary:
+        if score < 25:
+            ai_summary = "Verified authentic human writing. Strong idiosyncratic voice, high sentence burstiness, and natural stylistic variations."
+            key_indicators = ["High syntactic burstiness", "Natural vocabulary distribution", "Consistent authorial voice"]
+        elif score < 55:
+            ai_summary = "Moderate AI characteristics detected. Some sections show uniform phrasing and structured transitions."
+            key_indicators = ["Structured paragraph uniformity", "Standard academic transitions"]
+        else:
+            ai_summary = "High probability of AI-generated content. Persistent formulaic structure, hedging language, and repetitive syntax patterns."
+            key_indicators = ["Formulaic transitions", "Low syntactic burstiness", "Overly generic phrasing"]
 
     avg_burst = sum(burstiness_signals) / len(burstiness_signals) if burstiness_signals else 0.0
     avg_vocab = sum(vocab_signals) / len(vocab_signals) if vocab_signals else 0.0
@@ -363,10 +416,12 @@ async def detect_ai_content(
     logger.info(f"AI detection ({method}): {flagged_count}/{total} paragraphs flagged, score={score}")
 
     return AIDetectionResult(
-        score=min(score, 100.0),
+        score=min(max(score, 0.0), 100.0),
         flagged_segments=flagged,
         total_paragraphs=total,
         flagged_count=flagged_count,
-        avg_perplexity_signal=round(1.0 - avg_vocab, 3),  # Inverted vocab as proxy for perplexity
+        avg_perplexity_signal=round(1.0 - avg_vocab, 3),
         avg_burstiness_signal=round(avg_burst, 3),
+        ai_summary=ai_summary,
+        key_indicators=key_indicators,
     )

@@ -463,7 +463,8 @@
 
     var rep = data.report || {};
     var modules = data.module_details || [];
-    var score = Math.round(rep.authenticity_score !== undefined ? rep.authenticity_score : 100);
+    var riskScore = Math.round(rep.authenticity_score !== undefined ? rep.authenticity_score : 0);
+    var originalityScore = Math.max(0, 100 - riskScore);
     var status = (rep.status || "clean").toLowerCase();
 
     if (reportDocTitle) {
@@ -471,31 +472,32 @@
     }
 
     var badgeClass = "badge-clean";
-    var badgeText = "Clean / Authentic";
-    var barFillClass = "fill-clean";
+    var badgeText = "Clean & Authentic";
+    var strokeColor = "#22c55e";
+    var scoreDesc = "Verified Authentic Work. Overall risk index is " + riskScore + "% across Plagiarism, Semantic Similarity, AI Synthesizer, and Document Forensics.";
 
-    if (status === "review" || score > 30) {
+    if (status === "review" || (riskScore >= 25 && riskScore < 60)) {
       badgeClass = "badge-review";
-      badgeText = "Review Recommended";
-      barFillClass = "fill-review";
-    }
-    if (status === "flagged" || score > 60) {
+      badgeText = "Review Recommended (" + riskScore + "% Risk)";
+      strokeColor = "#f59e0b";
+      scoreDesc = "Moderate elevated indicators detected. Originality estimated at " + originalityScore + "%. Institutional review recommended.";
+    } else if (status === "flagged" || riskScore >= 60) {
       badgeClass = "badge-flagged";
-      badgeText = "Flagged Anomalies";
-      barFillClass = "fill-flagged";
+      badgeText = "Flagged Anomalies (" + riskScore + "% Risk)";
+      strokeColor = "#ef4444";
+      scoreDesc = "High probability of AI-generated content or substantial similarity overlap detected (" + riskScore + "% Risk Index).";
     }
 
-    var strokeColor = status === "clean" ? "#22c55e" : (status === "review" ? "#f59e0b" : "#ef4444");
-    var strokeDashoffset = 251.2 - (251.2 * score) / 100;
+    var strokeDashoffset = 251.2 - (251.2 * originalityScore) / 100;
 
     var modulesHtml = modules.map(function (m) {
       var mScore = Math.round(m.risk_score || 0);
       var mFill = mScore < 25 ? "fill-clean" : (mScore < 60 ? "fill-review" : "fill-flagged");
       var nameLabels = {
-        "plagiarism": "Verbatim Plagiarism",
-        "similarity": "Semantic Similarity",
+        "plagiarism": "Verbatim Plagiarism Risk",
+        "similarity": "Semantic Similarity Overlap",
         "ai_detection": "AI Generation Probability",
-        "manipulation": "Document Manipulation"
+        "manipulation": "Document Manipulation Risk"
       };
       return '<div class="module-card">' +
         '<div class="module-head">' +
@@ -508,11 +510,37 @@
       '</div>';
     }).join("");
 
-    var flaggedSegments = rep.flagged_segments || [];
+    // Extract AI Synthesis details
+    var aiModule = modules.find(function (m) { return m.module_name === "ai_detection"; });
+    var aiDetails = aiModule ? (aiModule.details || {}) : {};
+    var aiSummary = aiDetails.summary || "";
+    var keyIndicators = aiDetails.key_indicators || [];
+
+    var synthesisHtml = "";
+    if (aiSummary) {
+      synthesisHtml = '<div class="evidence-section" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;">' +
+        '<div class="evidence-title" style="color: #34d399; display: flex; align-items: center; gap: 7px; margin-bottom: 6px; font-weight: 600;">' +
+          '<i class="fa-solid fa-microchip"></i> AI Authorship &amp; Originality Synthesis' +
+        '</div>' +
+        '<p style="font-size: 13px; line-height: 1.5; color: #e2e8f0; margin: 0 0 8px 0;">' + aiSummary + '</p>' +
+        (keyIndicators.length > 0 ? (
+          '<div style="display: flex; flex-wrap: wrap; gap: 6px;">' +
+          keyIndicators.map(function (k) {
+            return '<span style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: #cbd5e1;"><i class="fa-solid fa-check" style="color: #34d399; margin-right: 4px;"></i>' + k + '</span>';
+          }).join('') +
+          '</div>'
+        ) : '') +
+      '</div>';
+    }
+
+    var flaggedSegments = (rep.flagged_segments || []).filter(function (f) {
+      return f.matched_source_ref !== "AI Authorship & Originality Audit";
+    });
+
     var evidenceHtml = "";
     if (flaggedSegments.length > 0) {
       evidenceHtml = '<div class="evidence-section">' +
-        '<div class="evidence-title">Flagged Segments & Evidence (' + flaggedSegments.length + ')</div>' +
+        '<div class="evidence-title">Flagged Segments &amp; Anomalies (' + flaggedSegments.length + ')</div>' +
         '<div class="evidence-list">' +
         flaggedSegments.map(function (f) {
           var sevClass = "sev-" + (f.severity || "medium");
@@ -523,10 +551,10 @@
         }).join("") +
         '</div>' +
       '</div>';
-    } else {
+    } else if (!aiSummary) {
       evidenceHtml = '<div class="evidence-section">' +
-        '<div class="evidence-title">Evidence</div>' +
-        '<div style="font-size: 13px; color: #4ade80; padding: 10px 0;"><i class="fa-solid fa-circle-check"></i> No critical plagiarism or manipulation anomalies detected across corpus.</div>' +
+        '<div class="evidence-title">Integrity Verification</div>' +
+        '<div style="font-size: 13px; color: #4ade80; padding: 8px 0;"><i class="fa-solid fa-circle-check"></i> Verified authentic work across all detection modules. Zero plagiarism or manipulation anomalies detected.</div>' +
       '</div>';
     }
 
@@ -537,14 +565,18 @@
             '<circle class="score-circle-bg" cx="50" cy="50" r="40"></circle>' +
             '<circle class="score-circle-bar" cx="50" cy="50" r="40" stroke="' + strokeColor + '" stroke-dasharray="251.2" stroke-dashoffset="' + strokeDashoffset + '"></circle>' +
           '</svg>' +
-          '<span class="score-number">' + score + '%</span>' +
+          '<div style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">' +
+            '<span class="score-number" style="line-height: 1;">' + originalityScore + '%</span>' +
+            '<span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-top: 2px;">Originality</span>' +
+          '</div>' +
         '</div>' +
         '<div class="score-meta">' +
           '<span class="score-badge ' + badgeClass + '">' + badgeText + '</span>' +
-          '<p class="score-desc">Overall composite risk score aggregated from 4 detection stages: Plagiarism, Semantic Similarity, AI Synthesizer, and Document Metadata Forensics.</p>' +
+          '<p class="score-desc">' + scoreDesc + '</p>' +
         '</div>' +
       '</div>' +
       '<div class="module-grid">' + modulesHtml + '</div>' +
+      synthesisHtml +
       evidenceHtml +
       '<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08);">' +
         '<a href="report.html?id=' + (rep.submission_id || "") + '" style="background: #fff; color: #07090e; font-weight: 600; padding: 9px 18px; border-radius: 8px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s;">' +

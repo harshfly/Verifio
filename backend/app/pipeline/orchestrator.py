@@ -108,6 +108,7 @@ async def run_pipeline(
 
         plagiarism_result = await detect_plagiarism_enhanced(processed.clean_text, processed.sentences, corpus)
         similarity_result = detect_similarity(processed.sentences, corpus)
+        await asyncio.sleep(0.8)
         ai_result = await detect_ai_content(processed.clean_text, processed.sentences)
         manipulation_result = detect_manipulation(processed.metadata)
 
@@ -159,6 +160,8 @@ async def run_pipeline(
                 "total_paragraphs": ai_result.total_paragraphs,
                 "avg_perplexity_signal": ai_result.avg_perplexity_signal,
                 "avg_burstiness_signal": ai_result.avg_burstiness_signal,
+                "summary": ai_result.ai_summary,
+                "key_indicators": ai_result.key_indicators,
                 "flagged_segments": [
                     {
                         "paragraph_index": f.paragraph_index,
@@ -234,15 +237,26 @@ async def run_pipeline(
             ))
 
         # — AI detection flags
-        for f in ai_result.flagged_segments:
+        if ai_result.flagged_segments:
+            for f in ai_result.flagged_segments:
+                db.add(FlaggedSegment(
+                    report_id=report.id,
+                    sentence_id=None,
+                    segment_text=f.paragraph_text,
+                    module="ai_detection",
+                    severity=_severity_from_confidence(f.ai_probability),
+                    matched_source_ref=None,
+                    confidence=f.ai_probability,
+                ))
+        elif ai_result.ai_summary:
             db.add(FlaggedSegment(
                 report_id=report.id,
                 sentence_id=None,
-                segment_text=f.paragraph_text,
+                segment_text=ai_result.ai_summary,
                 module="ai_detection",
-                severity=_severity_from_confidence(f.ai_probability),
-                matched_source_ref=None,
-                confidence=f.ai_probability,
+                severity="low",
+                matched_source_ref="AI Authorship & Originality Audit",
+                confidence=round(ai_result.score / 100.0, 2),
             ))
 
         # — Manipulation flags
