@@ -716,6 +716,22 @@
       });
     }
 
+    // Expand / collapse evidence drawers
+    document.querySelectorAll(".expand-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var targetId = this.getAttribute("data-target");
+        var drawer = document.getElementById(targetId);
+        if (!drawer) return;
+        var isOpen = drawer.style.display !== "none";
+        drawer.style.display = isOpen ? "none" : "block";
+        this.setAttribute("aria-expanded", !isOpen);
+        var icon = this.querySelector("i");
+        if (icon) {
+          icon.className = isOpen ? "fa-solid fa-chevron-down" : "fa-solid fa-chevron-up";
+        }
+      });
+    });
+
     // Load Demo button in error state
     var btnLoadDemo = document.getElementById("btn-load-demo");
     if (btnLoadDemo) {
